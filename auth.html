@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <link rel="stylesheet" href="styles.css">
+    <script type="module">
+        // These imports are used in the main script block below
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    </script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 auth-body">
+
+    <div class="bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-md">
+        <!-- Tab Controls to switch between Login and Sign Up -->
+        <div class="flex p-2 bg-white/10 rounded-t-2xl">
+            <button id="loginTab" class="w-1/2 py-3 font-semibold rounded-lg transition-all duration-300 tab-active">
+                Login
+            </button>
+            <button id="signupTab" class="w-1/2 py-3 font-semibold rounded-lg transition-all duration-300 tab-inactive">
+                Sign Up
+            </button>
+        </div>
+
+        <div class="p-8">
+            <h1 class="text-3xl font-bold title-animated-gradient text-center mb-4">TNVS OFFICIAL</h1>
+
+            <!-- Login Form Container -->
+            <div id="loginFormContainer" class="form-container">
+                <h2 class="text-2xl font-bold text-white text-center mb-6">Welcome Back!</h2>
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="loginEmail" class="block text-sm font-medium text-white mb-1">Email Address</label>
+                        <input id="loginEmail" name="email" type="email" required placeholder="you@example.com"
+                               class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label for="loginPassword" class="block text-sm font-medium text-white mb-1">Password</label>
+                        <div class="relative">
+                            <input id="loginPassword" name="password" type="password" required placeholder="••••••••"
+                                   class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition pr-12">
+                            <button type="button" id="toggleLoginPassword" class="absolute inset-y-0 right-0 flex items-center px-4 text-white/70 hover:text-white" aria-label="Toggle password visibility">
+                                <svg id="loginEyeOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <svg id="loginEyeClosed" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 .47 0 .927.038 1.372.113M15.98 8.04A6.002 6.002 0 0012 6c-3.314 0-6 2.686-6 6a6.002 6.002 0 002.04 4.02m5.94-5.94a3 3 0 10-4.243 4.243M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <a href="#" id="forgotPasswordLink" class="text-sm text-white hover:underline">Forgot Password?</a>
+                    </div>
+                    <div>
+                        <button type="submit"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-200 shadow-lg"
+                                id="loginButton">
+                            <span class="button-text">Log In</span>
+                            <div class="spinner"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sign Up Form Container (initially hidden) -->
+            <div id="signupFormContainer" class="form-container hidden">
+                <!-- Email Sign Up Form -->
+                <div id="emailSignupWrapper">
+                    <h2 class="text-2xl font-bold text-white text-center mb-6">Create Account</h2>
+                    <form id="signupForm" class="space-y-4">
+                        <div>
+                            <label for="signupName" class="block text-sm font-medium text-white mb-1">Full Name</label>
+                            <input id="signupName" name="name" type="text" required placeholder="John Doe"
+                                   class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                        </div>
+                        <div>
+                            <label for="signupEmail" class="block text-sm font-medium text-white mb-1">Email Address</label>
+                            <input id="signupEmail" name="email" type="email" required placeholder="you@example.com"
+                                   class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                        </div>
+                        <div>
+                            <label for="signupPassword" class="block text-sm font-medium text-white mb-1">Password</label>
+                            <div class="relative">
+                                <input id="signupPassword" name="password" type="password" required placeholder="••••••••"
+                                       class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition pr-12">
+                                <button type="button" id="toggleSignupPassword" class="absolute inset-y-0 right-0 flex items-center px-4 text-white/70 hover:text-white" aria-label="Toggle password visibility">
+                                    <svg id="signupEyeOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg id="signupEyeClosed" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 .47 0 .927.038 1.372.113M15.98 8.04A6.002 6.002 0 0012 6c-3.314 0-6 2.686-6 6a6.002 6.002 0 002.04 4.02m5.94-5.94a3 3 0 10-4.243 4.243M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit"
+                                    class="w-full flex justify-center py-3 px-4 mt-4 border border-transparent text-lg font-bold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-200 shadow-lg"
+                                    id="signupButton">
+                                <span class="button-text">Create Account</span>
+                                <div class="spinner"></div>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-4">
+                        <button id="switchToPhoneBtn" class="text-sm text-white hover:underline">Sign up with Phone instead</button>
+                    </div>
+                </div>
+
+                <!-- Phone Sign Up Form (hidden by default) -->
+                <div id="phoneSignupWrapper" class="hidden">
+                    <h2 class="text-2xl font-bold text-white text-center mb-6">Sign Up with Phone</h2>
+                    <form id="phoneSignupForm" class="space-y-4">
+                        <div id="phoneEntry">
+                            <div>
+                                <label for="phoneName" class="block text-sm font-medium text-white mb-1">Full Name</label>
+                                <input id="phoneName" name="name" type="text" required placeholder="John Doe"
+                                       class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                            </div>
+                            <div>
+                                <label for="phoneNumber" class="block text-sm font-medium text-white mb-1">Phone Number</label>
+                                <input id="phoneNumber" name="phone" type="tel" required placeholder="+91 98765 43210"
+                                       class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                            </div>
+                            <button type="submit" id="sendOtpBtn" class="w-full flex justify-center py-3 px-4 mt-4 border border-transparent text-lg font-bold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-200 shadow-lg">
+                                <span class="button-text">Send OTP</span>
+                                <div class="spinner"></div>
+                            </button>
+                        </div>
+                        <div id="otpEntry" class="hidden">
+                            <label for="otp" class="block text-sm font-medium text-white mb-1">Enter OTP</label>
+                            <input id="otp" name="otp" type="text" required placeholder="123456"
+                                   class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                            <button type="button" id="verifyOtpBtn" class="w-full flex justify-center py-3 px-4 mt-4 border border-transparent text-lg font-bold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-200 shadow-lg">
+                                <span class="button-text">Verify & Sign Up</span>
+                                <div class="spinner"></div>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="recaptcha-container" class="mt-4"></div>
+                    <div class="text-center mt-4">
+                        <button id="switchToEmailBtn" class="text-sm text-white hover:underline">Sign up with Email instead</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forgot Password Container (initially hidden) -->
+            <div id="forgotPasswordContainer" class="form-container hidden">
+                <h2 class="text-2xl font-bold text-white text-center mb-6">Reset Password</h2>
+                <p class="text-center text-white text-sm mb-6">Enter your email and we'll send a link to reset your password.</p>
+                <form id="forgotPasswordForm" class="space-y-6">
+                    <div>
+                        <label for="resetEmail" class="block text-sm font-medium text-white mb-1">Email Address</label>
+                        <input id="resetEmail" name="email" type="email" required placeholder="you@example.com"
+                               class="w-full px-4 py-3 bg-white/30 text-white placeholder-gray-200 rounded-lg border-2 border-transparent focus:border-white focus:bg-white/40 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <button type="submit" id="resetPasswordButton" class="w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold rounded-lg text-indigo-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-200 shadow-lg">
+                            <span class="button-text">Send Reset Link</span>
+                            <div class="spinner"></div>
+                        </button>
+                    </div>
+                </form>
+                <div class="text-center mt-6">
+                    <a href="#" id="backToLoginLink" class="text-sm text-white hover:underline">Back to Login</a>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative flex py-5 items-center">
+                <div class="flex-grow border-t border-gray-400"></div>
+                <span class="flex-shrink mx-4 text-gray-200">Or</span>
+                <div class="flex-grow border-t border-gray-400"></div>
+            </div>
+
+            <!-- Google Sign-In Button -->
+            <div class="flex justify-center">
+                <!-- Google Sign-In Button -->
+                <button id="googleSignInBtn"
+                        class="w-full flex items-center justify-center py-3 px-4 border-2 border-white/50 rounded-lg text-white bg-white/20 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-200 shadow-lg"
+                        aria-label="Sign up with Google">
+                    <svg class="button-icon w-6 h-6 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.223,0-9.655-3.657-11.303-8H6.306C9.656,39.663,16.318,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.012,36.49,44,30.638,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                    <span class="button-text font-semibold">Sign Up with Google</span>
+                    <div class="spinner"></div>
+                </button>
+            </div>
+
+    <!-- Success/Error Modal -->
+    <div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+            <p id="modalMessage" class="text-lg text-gray-800 mb-4"></p>
+            <button id="modalCloseBtn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const loginFormContainer = document.getElementById('loginFormContainer');
+            const signupFormContainer = document.getElementById('signupFormContainer');
+            const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+
+            // Function to switch between tabs
+            function switchTab(activeTab, inactiveTab, showForm, hideForm) {
+                activeTab.classList.replace('tab-inactive', 'tab-active');
+                inactiveTab.classList.replace('tab-active', 'tab-inactive');
+                showForm.classList.remove('hidden');
+                forgotPasswordContainer.classList.add('hidden'); // Always hide forgot password form on tab switch
+                hideForm.classList.add('hidden');
+            }
+
+            // Event listener for the login tab
+            loginTab.addEventListener('click', () => {
+                switchTab(loginTab, signupTab, loginFormContainer, signupFormContainer);
+            });
+
+            // Event listener for the sign-up tab
+            signupTab.addEventListener('click', () => {
+                switchTab(signupTab, loginTab, signupFormContainer, loginFormContainer);
+            });
+
+            // --- Password Visibility Toggle ---
+            const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+            const loginPassword = document.getElementById('loginPassword');
+            const loginEyeOpen = document.getElementById('loginEyeOpen');
+            const loginEyeClosed = document.getElementById('loginEyeClosed');
+
+            toggleLoginPassword.addEventListener('click', () => {
+                const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                loginPassword.setAttribute('type', type);
+                loginEyeOpen.classList.toggle('hidden');
+                loginEyeClosed.classList.toggle('hidden');
+            });
+
+            const toggleSignupPassword = document.getElementById('toggleSignupPassword');
+            const signupPassword = document.getElementById('signupPassword');
+            const signupEyeOpen = document.getElementById('signupEyeOpen');
+            const signupEyeClosed = document.getElementById('signupEyeClosed');
+
+            toggleSignupPassword.addEventListener('click', () => {
+                const type = signupPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                signupPassword.setAttribute('type', type);
+                signupEyeOpen.classList.toggle('hidden');
+                signupEyeClosed.classList.toggle('hidden');
+            });
+
+            // --- Forgot Password Toggle ---
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const backToLoginLink = document.getElementById('backToLoginLink');
+
+            forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginFormContainer.classList.add('hidden');
+                forgotPasswordContainer.classList.remove('hidden');
+            });
+
+            backToLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                forgotPasswordContainer.classList.add('hidden');
+                loginFormContainer.classList.remove('hidden');
+            });
+        });
+    </script>
+
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            RecaptchaVerifier,
+            signInWithPhoneNumber,
+            GoogleAuthProvider, 
+            OAuthProvider,
+            signInWithPopup,
+            updateProfile,
+            sendPasswordResetEmail
+        } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration from the tnvs-site project
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3u_PaiNu_XdmGO4mNw3WXzE8CRJRxmik",
+            authDomain: "tnvs-site.firebaseapp.com",
+            projectId: "tnvs-site",
+            storageBucket: "tnvs-site.appspot.com",
+            messagingSenderId: "278029964442",
+            appId: "1:278029964442:web:f961a26ca0b20ea61b7b23",
+            measurementId: "G-HZ3DZ31081"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        
+        // --- Sign Up Toggle Elements ---
+        const emailSignupWrapper = document.getElementById('emailSignupWrapper');
+        const phoneSignupWrapper = document.getElementById('phoneSignupWrapper');
+        const switchToPhoneBtn = document.getElementById('switchToPhoneBtn');
+        const switchToEmailBtn = document.getElementById('switchToEmailBtn');
+        const phoneSignupForm = document.getElementById('phoneSignupForm');
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const phoneEntry = document.getElementById('phoneEntry');
+        const otpEntry = document.getElementById('otpEntry');
+
+        // --- Forgot Password Elements ---
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+        // --- Button Loading State Helper ---
+        function toggleButtonLoading(button, isLoading) {
+            const buttonText = button.querySelector('.button-text');
+            const buttonIcon = button.querySelector('.button-icon');
+            const spinner = button.querySelector('.spinner');
+
+            button.disabled = isLoading;
+            spinner.style.display = isLoading ? 'block' : 'none';
+            if (buttonText) buttonText.style.display = isLoading ? 'none' : 'block';
+            if (buttonIcon) buttonIcon.style.display = isLoading ? 'none' : 'block';
+        }
+
+
+        // --- Modal Functions ---
+        let onModalCloseCallback = null;
+
+        function showMessage(message, isError = false, callback = null) {
+            modalMessage.textContent = message;
+            modalMessage.style.color = isError ? '#dc2626' : '#1f2937'; // red-600 for error, gray-800 for success
+            onModalCloseCallback = callback;
+            messageModal.classList.remove('hidden');
+        }
+
+        modalCloseBtn.addEventListener('click', () => {
+            messageModal.classList.add('hidden');
+            if (onModalCloseCallback) {
+                onModalCloseCallback();
+                onModalCloseCallback = null; // Reset callback after execution
+            }
+        });
+
+        // --- Sign Up View Toggling ---
+        switchToPhoneBtn.addEventListener('click', () => {
+            emailSignupWrapper.classList.add('hidden');
+            phoneSignupWrapper.classList.remove('hidden');
+        });
+
+        switchToEmailBtn.addEventListener('click', () => {
+            phoneSignupWrapper.classList.add('hidden');
+            emailSignupWrapper.classList.remove('hidden');
+            // Reset phone form state
+            phoneEntry.classList.remove('hidden');
+            otpEntry.classList.add('hidden');
+            phoneSignupForm.reset();
+        });
+
+        // --- Sign Up Logic ---
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const signupButton = document.getElementById('signupButton');
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            toggleButtonLoading(signupButton, true);
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // Update user profile with name
+                    return updateProfile(user, { displayName: name })
+                        .then(() => {
+                            // Save additional user info to Firestore
+                            const userDocRef = doc(db, "users", user.uid);
+                            return setDoc(userDocRef, {
+                                uid: user.uid,
+                                displayName: name,
+                                email: user.email,
+                                createdAt: new Date()
+                            });
+                        });
+                })
+                .then(() => {
+                    toggleButtonLoading(signupButton, false);
+                    signupForm.reset();
+                    showMessage("Account created successfully! Redirecting to your dashboard...", false, () => {
+                        window.location.href = 'main_dashboard.html';
+                    });
+                })
+                .catch((error) => {
+                    let friendlyMessage = 'An error occurred. Please try again.';
+                    if (error.code === 'auth/email-already-in-use') {
+                        friendlyMessage = 'This email is already in use. Please log in or use a different email.';
+                    } else if (error.code === 'auth/weak-password') {
+                        friendlyMessage = 'Your password is too weak. It must be at least 6 characters long.';
+                    }
+                    toggleButtonLoading(signupButton, false);
+                    showMessage(friendlyMessage, true);
+                    console.error("Sign up error:", error);
+                });
+        });
+
+        // --- Login Logic ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const loginButton = document.getElementById('loginButton');
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            toggleButtonLoading(loginButton, true);
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    toggleButtonLoading(loginButton, false);
+                    loginForm.reset();
+                    // On successful login, redirect to the dashboard
+                    window.location.href = 'main_dashboard.html';
+                })
+                .catch((error) => {
+                    toggleButtonLoading(loginButton, false);
+                    let friendlyMessage = 'Invalid credentials. Please check your email and password.';
+                    if (error.code === 'auth/invalid-credential') {
+                        friendlyMessage = 'Invalid email or password. Please try again.';
+                    }
+                    showMessage(friendlyMessage, true);
+                    console.error("Login error:", error);
+                });
+        });
+
+        // --- Forgot Password Logic ---
+        forgotPasswordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const resetButton = document.getElementById('resetPasswordButton');
+            const email = document.getElementById('resetEmail').value;
+            toggleButtonLoading(resetButton, true);
+
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    toggleButtonLoading(resetButton, false);
+                    showMessage("Password reset email sent! Please check your inbox (and spam folder).");
+                })
+                .catch((error) => {
+                    toggleButtonLoading(resetButton, false);
+                    showMessage("Could not send reset email. Please check the address and try again.", true);
+                    console.error("Password Reset Error:", error);
+                });
+        });
+
+        // --- Phone Sign Up Logic ---
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'invisible',
+            'callback': (response) => {
+                // reCAPTCHA solved, allow signInWithPhoneNumber.
+                console.log("reCAPTCHA verified");
+            }
+        });
+        // Render the reCAPTCHA verifier so it's ready when needed
+        recaptchaVerifier.render();
+
+        sendOtpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const appVerifier = window.recaptchaVerifier;
+            toggleButtonLoading(sendOtpBtn, true);
+
+            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    // SMS sent. Prompt user to type the code from the message, then sign the
+                    // user in with confirmationResult.confirm(code).
+                    window.confirmationResult = confirmationResult;
+                    showMessage("OTP has been sent to your phone.");
+                    toggleButtonLoading(sendOtpBtn, false);
+                    phoneEntry.classList.add('hidden');
+                    otpEntry.classList.remove('hidden');
+                }).catch((error) => {
+                    // Error; SMS not sent
+                    toggleButtonLoading(sendOtpBtn, false);
+                    showMessage("Failed to send OTP. Please check the phone number and try again.", true);
+                    console.error("SMS not sent error:", error);
+                    // Reset the reCAPTCHA so the user can try again
+                    window.recaptchaVerifier.render().then(function(widgetId) {
+                        grecaptcha.reset(widgetId);
+                    });
+                });
+        });
+
+        verifyOtpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('otp').value;
+            const name = document.getElementById('phoneName').value;
+            toggleButtonLoading(verifyOtpBtn, true);
+
+            window.confirmationResult.confirm(otp).then((result) => {
+                // User signed in successfully.
+                const user = result.user;
+                return updateProfile(user, { displayName: name })
+                    .then(() => {
+                        const userDocRef = doc(db, "users", user.uid);
+                        return setDoc(userDocRef, {
+                            uid: user.uid,
+                            displayName: name,
+                            phoneNumber: user.phoneNumber,
+                            createdAt: new Date()
+                        });
+                    });
+            }).then(() => {
+                toggleButtonLoading(verifyOtpBtn, false);
+                phoneSignupForm.reset();
+                showMessage("Account created successfully! Redirecting to your dashboard...", false, () => {
+                    window.location.href = 'main_dashboard.html';
+                });
+            }).catch((error) => {
+                // User couldn't sign in (bad verification code?)
+                toggleButtonLoading(verifyOtpBtn, false);
+                showMessage("Invalid OTP. Please try again.", true);
+                console.error("OTP verification error:", error);
+            });
+        });
+
+        // --- Google Sign-In Logic ---
+        function handleGoogleSignIn() {
+            const provider = new GoogleAuthProvider();
+            toggleButtonLoading(googleSignInBtn, true);
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    const userDocRef = doc(db, "users", user.uid);
+
+                    // Check if user is new, if so, create a document in Firestore
+                    return getDoc(userDocRef).then(docSnap => {
+                        if (!docSnap.exists()) {
+                            return setDoc(userDocRef, {
+                                uid: user.uid,
+                                displayName: user.displayName,
+                                email: user.email,
+                                createdAt: new Date()
+                    }).then(() => true); // Indicate new user
+                        }
+                return false; // Indicate existing user
+                    });
+                })
+        .then((isNewUser) => {
+            if (isNewUser) {
+                showMessage("Account created successfully! Redirecting to your dashboard...", false, () => {
+                    window.location.href = 'main_dashboard.html';
+                });
+            } else {
+                // On successful Google sign-in, redirect to the dashboard
+                window.location.href = 'main_dashboard.html';
+            }
+                })
+                .catch((error) => {
+                    toggleButtonLoading(googleSignInBtn, false);
+                    showMessage('Failed to sign in with Google. Please try again.', true);
+                    console.error("Google Sign-In Error:", error);
+                });
+        }
+
+        // --- Event Listeners ---
+        googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+    </script>
+</body>
+</html>

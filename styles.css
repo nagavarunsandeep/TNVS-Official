@@ -1,0 +1,141 @@
+/* --- General Styles --- */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- Shared Components --- */
+
+/* Animated Gradient for Titles (Unified Style) */
+.title-animated-gradient {
+    background: linear-gradient(90deg, #ddd6fe, #ffffff, #a7b2f5, #ffffff, #ddd6fe);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: flow-gradient 4s linear infinite;
+}
+
+@keyframes flow-gradient {
+    to {
+        background-position: -200% center;
+    }
+}
+
+
+/* --- Auth Page Styles (auth.html) --- */
+
+.auth-body {
+    /* A vibrant gradient background */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Style for the active tab button */
+.tab-active {
+    background-color: white;
+    color: #667eea;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+/* Style for the inactive tab button */
+.tab-inactive {
+    background-color: transparent;
+    color: white;
+}
+/* Simple fade-in animation for form containers */
+.form-container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Loading Spinner for Buttons --- */
+.spinner {
+    display: none; /* Hidden by default */
+    animation: spin 1s linear infinite;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    width: 1.5rem; /* 24px */
+    height: 1.5rem; /* 24px */
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Main Dashboard Styles (main_dashboard.html) --- */
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+.sidebar-link:hover {
+    background-color: #4a5568; /* gray-700 */
+}
+.sidebar-link.active {
+    background-color: #667eea;
+    color: white;
+    font-weight: 600;
+}
+
+/* --- Interactive Card Styles for Dashboard --- */
+.interactive-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.interactive-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Dashboard Content Transitions --- */
+.content-section {
+    animation: contentFadeIn 0.4s ease-in-out;
+}
+@keyframes contentFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Chatbot Styles --- */
+#chatbot-messages {
+    scroll-behavior: smooth;
+    height: 20rem; /* 320px */
+    overflow-y: auto;
+}
+
+#chatbot-window {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+#chatbot-window.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.user-message {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.user-message > div {
+    background-color: #667eea; /* indigo-500 */
+    color: white;
+}
+
+.bot-message {
+    display: flex;
+}
+
+.bot-message > div {
+    background-color: #e5e7eb; /* gray-200 */
+    color: #1f2937; /* gray-800 */
+}

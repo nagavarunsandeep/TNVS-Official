@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-4xl p-8 text-center">
+        <h1 id="welcomeMessage" class="text-4xl font-bold text-gray-800 mb-4">Welcome!</h1>
+        <p class="text-lg text-gray-600">You have successfully logged in to your dashboard.</p>
+        <div class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button id="enterBtn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-200 shadow-lg w-full sm:w-auto">
+                Enter
+            </button>
+            <button id="logoutBtn" class="bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition duration-200 shadow-lg w-full sm:w-auto">
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration from the tnvs-site project
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3u_PaiNu_XdmGO4mNw3WXzE8CRJRxmik",
+            authDomain: "tnvs-site.firebaseapp.com",
+            projectId: "tnvs-site",
+            storageBucket: "tnvs-site.appspot.com",
+            messagingSenderId: "278029964442",
+            appId: "1:278029964442:web:f961a26ca0b20ea61b7b23",
+            measurementId: "G-HZ3DZ31081"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Check authentication state to protect the page and welcome the user
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in. Display their name.
+                welcomeMessage.textContent = `Welcome, ${user.displayName || 'User'}!`;
+            } else {
+                // No user is signed in. Redirect to the login page.
+                window.location.href = 'auth.html';
+            }
+        });
+
+        // Logout button event listener
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = 'auth.html';
+            }).catch((error) => {
+                console.error('Sign out error:', error);
+                alert('Failed to log out. Please try again.');
+            });
+        });
+
+        // Placeholder for the Enter button functionality
+        const enterBtn = document.getElementById('enterBtn');
+        enterBtn.addEventListener('click', () => {
+            // Navigate to the main dashboard interface
+            window.location.href = 'main_dashboard.html';
+        });
+    </script>
+
+</body>
+</html>
