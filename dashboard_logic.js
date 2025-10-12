@@ -197,16 +197,18 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
 
     toggleSidebarBtn.addEventListener('click', () => {
         sidebar.classList.toggle('w-64');
-        sidebar.classList.toggle('w-0');
-        sidebar.classList.toggle('p-0');
+        sidebar.classList.add('w-0');
+        sidebar.classList.add('p-0');
         showSidebarBtn.classList.remove('hidden');
+        toggleSidebarBtn.classList.add('hidden');
     });
 
     showSidebarBtn.addEventListener('click', () => {
         sidebar.classList.toggle('w-64');
-        sidebar.classList.toggle('w-0');
-        sidebar.classList.toggle('p-0');
+        sidebar.classList.remove('w-0');
+        sidebar.classList.remove('p-0');
         showSidebarBtn.classList.add('hidden');
+        toggleSidebarBtn.classList.remove('hidden');
     });
 
     // --- Profile Photo Upload Logic ---
