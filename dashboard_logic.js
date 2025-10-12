@@ -53,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerProfilePic = document.getElementById('headerProfilePic');
 
     // Edit Profile elements
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    const editProfileFormContainer = document.getElementById('editProfileForm');
     const profileLogoutBtn = document.getElementById('profileLogoutBtn');
 
     // Header Dropdown elements
@@ -252,13 +250,6 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
     }
     
-    // --- Edit Profile Logic ---
-    editProfileBtn.addEventListener('click', () => {
-        profileContent.classList.add('hidden');
-        editProfileFormContainer.classList.remove('hidden');
-        populateEditForm();
-    });
-
     async function populateEditForm() {
         const user = auth.currentUser;
         if (!user) return;
@@ -269,13 +260,18 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         const userData = docSnap.exists() ? docSnap.data() : {};
 
         const currentName = userData.displayName || user.displayName || '';
+        const currentEmail = user.email || '';
 
         editProfileFormContainer.innerHTML = `
             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Edit Your Profile</h3>
             <form id="profile-edit-form" class="space-y-6">
                 <div>
                     <label for="edit-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
-                    <input type="text" id="edit-name" value="${currentName}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                    <input type="text" id="edit-name" value="${currentName}" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div>
+                    <label for="edit-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                    <input type="email" id="edit-email" value="${currentEmail}" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
                     <button type="button" id="cancelEditBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Cancel</button>
@@ -300,23 +296,40 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         if (!user) return;
 
         const newName = document.getElementById('edit-name').value;
+        const newEmail = document.getElementById('edit-email').value;
+        let changesMade = false;
 
         try {
-            // Update Auth profile
-            await updateProfile(user, { displayName: newName });
+            // Update display name if it has changed
+            if (newName !== (user.displayName || '')) {
+                await updateProfile(user, { displayName: newName });
+                const userDocRef = doc(db, "users", user.uid);
+                await setDoc(userDocRef, { displayName: newName }, { merge: true });
+                
+                // Update UI
+                profileName.textContent = newName;
+                profileDetailName.textContent = newName;
+                headerUserName.textContent = newName;
+                changesMade = true;
+            }
 
-            // Update Firestore document
-            const userDocRef = doc(db, "users", user.uid);
-            await setDoc(userDocRef, { 
-                displayName: newName, 
-            }, { merge: true });
+            // Update email if it has changed
+            if (newEmail !== user.email) {
+                // Note: Updating email in Firebase Auth is a sensitive operation
+                // and might require re-authentication for security reasons.
+                // This implementation attempts a direct update.
+                await updateEmail(user, newEmail);
+                const userDocRef = doc(db, "users", user.uid);
+                await setDoc(userDocRef, { email: newEmail }, { merge: true });
 
-            // Update UI
-            profileName.textContent = newName;
-            profileDetailName.textContent = newName;
-            headerUserName.textContent = newName;
+                profileEmail.textContent = newEmail;
+                profileDetailEmail.textContent = newEmail;
+                changesMade = true;
+            }
 
-            alert('Profile updated successfully!');
+            if (changesMade) {
+                alert('Profile updated successfully!');
+            }
             editProfileFormContainer.classList.add('hidden');
             profileContent.classList.remove('hidden');
         } catch (error) {
