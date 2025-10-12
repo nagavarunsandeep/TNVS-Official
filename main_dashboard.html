@@ -7,11 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Apply theme from localStorage on initial load to prevent flash of unstyled content
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
 
     <div class="flex h-screen bg-gray-100">
-        <!-- Sidebar -->
         <aside class="w-64 bg-gray-800 text-gray-200 flex flex-col">
             <div class="p-6 text-center">
                 <h1 class="text-2xl font-bold title-animated-gradient">TNVS OFFICIAL</h1>
@@ -35,20 +42,18 @@
                     </svg>
                     Windows Automation
                 </a>
-
-
+                <a href="#" id="aiHelperLink" class="sidebar-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                    AI Helper
+                </a>
                 <a href="#" id="settingsLink" class="sidebar-link">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     Settings
-                </a>
-                <a href="#" id="automationLink" class="sidebar-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                    Windows Automation
                 </a>
             </nav>
             <div class="p-4 border-t border-gray-700">
@@ -58,48 +63,111 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white shadow-md p-4 flex justify-between items-center">
-                <h2 id="headerTitle" class="text-2xl font-semibold text-gray-800">Dashboard Overview</h2>
+            <header class="bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
+                <h2 id="headerTitle" class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Dashboard Overview</h2>
                 <div class="flex items-center space-x-4">
-                    <div id="welcomeMessage" class="text-md text-gray-600 font-semibold">
-                        Welcome!
+                    <div class="text-md text-gray-600 dark:text-gray-300 font-semibold">
+                        <span>Welcome, </span>
+                        <span id="headerUserName">User</span>
                     </div>
                     <img id="headerProfilePic" class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/40x40/E0E7FF/4338CA?text=U" alt="User profile picture">
+                    <button id="headerThemeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg id="themeIconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <svg id="themeIconMoon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
                 </div>
             </header>
 
-            <!-- Content Area -->
-            <div class="flex-1 p-6 overflow-y-auto">
-                <!-- Dashboard Content -->
+            <div class="flex-1 p-6 overflow-y-auto bg-gray-100 dark:bg-gray-900">
                 <div id="dashboardContent" class="content-section">
-                    
-                     <!-- YouTube Channel Card -->
-                     <div class="mt-8">
-                        <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">FOLLOW US ON</h2>
-                        <div class="bg-gradient-to-r from-gray-700 via-gray-900 to-black p-6 rounded-xl shadow-2xl interactive-card">
-                             <div class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-6">
-                                 <div class="flex items-center space-x-4">
-                                     <img class="h-20 w-20 rounded-full object-cover border-4 border-indigo-400" src="images/IMG_20250410_181151.jpg" alt="TNVS Official YouTube Channel">
-                                     <div>
-                                         <p class="text-sm font-medium text-gray-400">Official Channel</p>
-                                         <h3 class="text-2xl font-bold text-white">TNVS OFFICIAL</h3>
-                                     </div>
-                                    </div>
-                                 <a href="https://youtube.com/@tnvs_official?feature=shared" target="_blank" rel="noopener noreferrer" class="bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-red-700 transition-transform transform hover:scale-105 shadow-lg flex items-center">
-                                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.861-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"></path></svg>
-                                     Subscribe
-                                 </a>
-                             </div>
-                         </div>
-                     </div>
+                    <div class="mb-8">
+                        <h3 id="welcomeMessage" class="text-3xl font-bold text-gray-800 dark:text-gray-100">Good Morning, User!</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mt-1">Here's a summary of your workspace.</p>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-gray-700 via-gray-900 to-black p-6 rounded-xl shadow-2xl interactive-card mb-8">
+                        <h2 class="text-2xl font-semibold text-white mb-4 text-center">FOLLOW US ON</h2>
+                        <div class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-6">
+                            <div class="flex items-center space-x-4">
+                                <img class="h-20 w-20 rounded-full object-cover border-4 border-indigo-400" src="images/IMG_20250410_181151.jpg" alt="TNVS Official YouTube Channel">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-400">Official Channel</p>
+                                    <h3 class="text-2xl font-bold text-white">TNVS OFFICIAL</h3>
+                                </div>
+                            </div>
+                            <a href="https://youtube.com/@tnvs_official?feature=shared" target="_blank" rel="noopener noreferrer" class="bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-red-700 transition-transform transform hover:scale-105 shadow-lg flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.861-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"></path></svg>
+                                Subscribe
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center">
+                            <div id="profileCompleteness" class="w-24 h-24 rounded-full flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 mr-6">
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-300">0%</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Profile Status</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Complete your profile for a better experience.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center">
+                            <div class="bg-purple-100 dark:bg-purple-900 p-4 rounded-full mr-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600 dark:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Automation Tasks</h4>
+                                <p id="automationTaskCount" class="text-2xl font-bold text-gray-700 dark:text-gray-200 mt-1">0 Available</p>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <div class="flex items-center mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">System Status</h4>
+                            </div>
+                            <p class="text-sm text-green-600 dark:text-green-400 font-semibold mb-4">All systems normal</p>
+                            <div class="space-y-2 text-sm">
+                                <p class="text-gray-600 dark:text-gray-400">Disk Space: <span class="font-semibold text-gray-800 dark:text-gray-200">75% Used</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">CPU Load: <span class="font-semibold text-gray-800 dark:text-gray-200">15%</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Quick Actions</h4>
+                            <div class="space-y-4">
+                                <button id="quickEditProfile" class="w-full text-left flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    <span class="font-semibold">Edit Your Profile</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">My Tasks</h4>
+                            <form id="taskForm" class="flex items-center space-x-2 mb-4">
+                                <input id="taskInput" type="text" placeholder="Add a new task..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button type="submit" class="bg-indigo-600 text-white p-2.5 rounded-lg hover:bg-indigo-700 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </button>
+                            </form>
+                            <div id="taskList" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                                </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Profile Content (hidden by default) -->
                 <div id="profileContent" class="hidden content-section">
-                    <div class="bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
                         <div class="flex flex-col items-center text-center">
                             <div class="relative group mb-4">
                                 <img id="profilePicture" src="https://placehold.co/128x128/E0E7FF/4338CA?text=User" alt="User Profile Picture" class="w-32 h-32 rounded-full border-4 border-indigo-200 object-cover">
@@ -114,65 +182,154 @@
                                     <div class="w-10 h-10 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
                                 </div>
                             </div>
-                            <h3 id="profileName" class="text-3xl font-bold text-gray-800">User Name</h3>
-                            <p id="profileEmail" class="text-md text-gray-500 mt-1">user@example.com</p>
+                            <h3 id="profileName" class="text-3xl font-bold text-gray-800 dark:text-gray-100">User Name</h3>
+                            <p id="profileEmail" class="text-md text-gray-500 dark:text-gray-400 mt-1">user@example.com</p>
                         </div>
-                        <div class="mt-8 border-t border-gray-200 pt-6">
+                        <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
                             <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                                 <div class="sm:col-span-1">
-                                    <dt class="text-sm font-medium text-gray-500">Full Name</dt>
-                                    <dd id="profileDetailName" class="mt-1 text-lg text-gray-900">User Name</dd>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</dt>
+                                    <dd id="profileDetailName" class="mt-1 text-lg text-gray-900 dark:text-gray-100">User Name</dd>
                                 </div>
                                 <div class="sm:col-span-1">
-                                    <dt class="text-sm font-medium text-gray-500">Email address</dt>
-                                    <dd id="profileDetailEmail" class="mt-1 text-lg text-gray-900">user@example.com</dd>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email address</dt>
+                                    <dd id="profileDetailEmail" class="mt-1 text-lg text-gray-900 dark:text-gray-100">user@example.com</dd>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <dt class="text-sm font-medium text-gray-500">Member Since</dt>
-                                    <dd id="profileMemberSince" class="mt-1 text-lg text-gray-900">-</dd>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Member Since</dt>
+                                    <dd id="profileMemberSince" class="mt-1 text-lg text-gray-900 dark:text-gray-100">-</dd>
                                 </div>
-                            </dl>
+                                </dl>
+                        </div>
+                        <div class="mt-8 border-t border-gray-200 pt-6 text-right">
+                            <button id="editProfileBtn" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition">
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                    <div id="editProfileForm" class="hidden bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Edit Your Profile</h3>
+                    </div>
+                </div>
+
+                <div id="aiHelperContent" class="hidden content-section">
+                    <div class="max-w-4xl mx-auto space-y-8">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <div class="flex items-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                                <h4 class="text-xl font-bold text-gray-800 dark:text-gray-100">AI Content Helper</h4>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Need help writing something? Give the AI a prompt below.</p>
+                            <div class="space-y-4">
+                                <textarea id="aiPromptInput" rows="3" placeholder="e.g., Write a professional email to a client about a project update..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                                <button id="generateAiContentBtn" class="w-full bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">Generate</button>
+                            </div>
+                        </div>
+                        <div id="aiContentOutput" class="hidden bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Generated Content</h4>
+                            <div class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"></div>
                         </div>
                     </div>
                 </div>
-                 <!-- Settings Content (hidden by default) -->
+
                 <div id="settingsContent" class="hidden content-section">
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Settings</h3>
+                    <div class="space-y-8 max-w-4xl mx-auto">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Appearance</h3>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-md font-semibold text-gray-700 dark:text-gray-300">Interface Theme</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Select your preferred light or dark theme.</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-gray-600">Light</span>
+                                    <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" value="" id="theme-toggle" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-gray-800"></div>
+                                        <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-full"></span>
+                                    </label>
+                                    <span class="text-sm font-medium text-gray-600">Dark</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Notifications</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-md font-semibold text-gray-700 dark:text-gray-300">Email Notifications</span>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Receive updates and news via email.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" checked><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Account Management</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Manage your account settings and data.</p>
+                            <button class="w-full sm:w-auto bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition">Delete Account</button>
+                        </div>
+                    </div>
                 </div>
 
 
-                <!-- Windows Automation Content (hidden by default) -->
                 <div id="automationContent" class="hidden content-section">
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Windows Automation Tasks</h3>
+                        <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Windows Automation Tasks</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Automation Card 1 -->
-                            <div class="bg-white p-6 rounded-xl shadow-lg interactive-card">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg interactive-card">
                                 <div class="flex items-center mb-4">
-                                    <img src="images/file-organizer.png" alt="File Organizer Icon" class="w-12 h-12 mr-4 object-contain">
-                                    <h4 class="text-lg font-bold text-gray-800">File Organizer</h4>
+                                    <img src="images/file-organizer.png" alt="Photo Virus Icon" class="w-12 h-12 mr-4 object-contain">
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Photo Virus</h4>
                                 </div>
-                                <p class="text-gray-600 text-sm mb-4">Automatically sort and organize files based on custom rules.</p>
-                                <button class="w-full bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">Launch</button>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Automatically sort and organize files based on custom rules.</p>
+                                <a href="photovirus:launch" id="launchPhotoVirusBtn" class="block text-center w-full bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">
+                                    Launch
+                                </a>
                             </div>
-                            <!-- Automation Card 2 -->
-                            <div class="bg-white p-6 rounded-xl shadow-lg interactive-card">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg interactive-card">
                                 <div class="flex items-center mb-4">
                                     <img src="images/scheduled-tasks.png" alt="Scheduled Tasks Icon" class="w-12 h-12 mr-4 object-contain">
-                                    <h4 class="text-lg font-bold text-gray-800">Scheduled Tasks</h4>
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Scheduled Tasks</h4>
                                 </div>
-                                <p class="text-gray-600 text-sm mb-4">Run scripts and applications at specified times or intervals.</p>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Run scripts and applications at specified times or intervals.</p>
                                 <button class="w-full bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700 transition">Configure</button>
                             </div>
-                            <!-- Automation Card 3 -->
-                            <div class="bg-white p-6 rounded-xl shadow-lg interactive-card">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg interactive-card">
                                 <div class="flex items-center mb-4">
                                     <img src="images/data-entry.png" alt="Data Entry Icon" class="w-12 h-12 mr-4 object-contain">
-                                    <h4 class="text-lg font-bold text-gray-800">Data Entry Bot</h4>
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Data Entry Bot</h4>
                                 </div>
-                                <p class="text-gray-600 text-sm mb-4">Automate data entry from spreadsheets or web forms into applications.</p>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Automate data entry from spreadsheets or web forms into applications.</p>
                                 <button class="w-full bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition">Start</button>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg interactive-card">
+                                <div class="flex items-center mb-4">
+                                    <img src="images/system-cleanup.png" alt="System Cleanup Icon" class="w-12 h-12 mr-4 object-contain">
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">System Cleanup</h4>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Free up disk space by automatically removing temporary files and cache.</p>
+                                <button class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Run Now</button>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg interactive-card">
+                                <div class="flex items-center mb-4">
+                                    <img src="images/automated-backup.png" alt="Automated Backup Icon" class="w-12 h-12 mr-4 object-contain">
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Automated Backup</h4>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Schedule backups of your important files and folders to a secure location.</p>
+                                <button class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition">Setup</button>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg interactive-card">
+                                <div class="flex items-center mb-4">
+                                    <img src="images/wscript-icon.png" alt="WScript Icon" class="w-12 h-12 mr-4 object-contain">
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">User Greeter Script</h4>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Downloads a VBScript file that shows a personalized welcome message.</p>
+                                <button id="runGreeterScriptBtn" class="w-full bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition">Download & Run</button>
                             </div>
                         </div>
                     </div>
@@ -183,31 +340,25 @@
 
     <script type="module" src="dashboard_logic.js"></script>
 
-    <!-- Chatbot Button -->
     <button id="chatbot-toggle" class="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-110 focus:outline-none z-50">
-        <img src="images/pngtree-smart-chatbot-cartoon-clipart-png-image_9015126.png" alt="Chatbot Icon" class="h-8 w-8">
+        <img src="images/pngtree-smart-chatbot-cartoon-clipart-png-image_9015126 (1).png" alt="Chatbot Icon" class="h-8 w-8">
     </button>
 
-    <!-- Chatbot Window -->
-    <div id="chatbot-window" class="hidden fixed bottom-24 right-8 w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col z-40">
-        <!-- Header -->
+    <div id="chatbot-window" class="hidden fixed bottom-24 right-8 w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-2xl flex flex-col z-40">
         <div class="bg-indigo-600 text-white p-4 rounded-t-xl flex justify-between items-center">
             <h3 class="font-bold text-lg">TNVS AI Assistant</h3>
             <button id="chatbot-close" class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
         </div>
-        <!-- Messages -->
         <div id="chatbot-messages" class="p-4 space-y-4">
-            <!-- Bot Welcome Message -->
             <div class="bot-message">
-                <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-xs">
+                <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-lg max-w-xs">
                     <p>Hello! How can I help you today?</p>
                 </div>
             </div>
         </div>
-        <!-- Input -->
-        <div class="p-4 border-t border-gray-200">
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <form id="chatbot-form" class="flex items-center space-x-2">
-                <input id="chatbot-input" type="text" placeholder="Type your message..." class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input id="chatbot-input" type="text" placeholder="Type your message..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <button type="submit" class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
