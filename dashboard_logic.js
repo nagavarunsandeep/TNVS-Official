@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileContent = document.getElementById('profileContent');
     const automationContent = document.getElementById('automationContent');
     const aiHelperContent = document.getElementById('aiHelperContent');
+    const gameContent = document.getElementById('gameContent');
     const settingsContent = document.getElementById('settingsContent');
     
     // Sidebar links
@@ -37,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileLink = document.getElementById('profileLink');
     const automationLink = document.getElementById('automationLink');
     const aiHelperLink = document.getElementById('aiHelperLink');
+    const gameLink = document.getElementById('gameLink');
     
     const settingsLink = document.getElementById('settingsLink');
     // Profile detail elements
@@ -73,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function showSection(sectionToShow, activeLink) {
         // Hide all sections
-        [dashboardContent, profileContent, automationContent, aiHelperContent, settingsContent].forEach(sec => sec.classList.add('hidden'));
+        [dashboardContent, profileContent, automationContent, aiHelperContent, gameContent, settingsContent].forEach(sec => sec.classList.add('hidden'));
         // Deactivate all links
         sidebarNav.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
     
@@ -104,6 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         showSection(aiHelperContent, aiHelperLink);
         headerTitle.textContent = 'AI Content Helper';
+    });
+
+    gameLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(gameContent, gameLink);
+        headerTitle.textContent = 'TNVS Game Zone';
     });
 
     settingsLink.addEventListener('click', (e) => {
