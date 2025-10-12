@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = getAuth(app);
     const storage = getStorage(app);
     const db = getFirestore(app);
+    const sidebar = document.getElementById('sidebar');
     
     const headerUserName = document.getElementById('headerUserName');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -145,6 +146,24 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url); // Clean up the object URL
+    });
+
+    // --- Sidebar Toggle Logic ---
+    const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+    const showSidebarBtn = document.getElementById('showSidebarBtn');
+
+    toggleSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('w-64');
+        sidebar.classList.toggle('w-0');
+        sidebar.classList.toggle('p-0');
+        showSidebarBtn.classList.remove('hidden');
+    });
+
+    showSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('w-64');
+        sidebar.classList.toggle('w-0');
+        sidebar.classList.toggle('p-0');
+        showSidebarBtn.classList.add('hidden');
     });
 
     // --- Profile Photo Upload Logic ---
