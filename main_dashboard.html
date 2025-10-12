@@ -8,14 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script>
-        // Apply theme from localStorage on initial load to prevent flash of unstyled content
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
 
@@ -87,20 +79,20 @@
                     </button>
                     <h2 id="headerTitle" class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Dashboard Overview</h2>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-md text-gray-600 dark:text-gray-300 font-semibold">
-                        <span>Welcome, </span>
-                        <span id="headerUserName">User</span>
+                <div class="relative">
+                    <div id="profileDropdownToggle" class="flex items-center space-x-4 cursor-pointer">
+                        <div class="text-md text-gray-600 dark:text-gray-300 font-semibold text-right">
+                            <span>Welcome, </span>
+                            <span id="headerUserName">User</span>
+                        </div>
+                        <img id="headerProfilePic" class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/40x40/E0E7FF/4338CA?text=U" alt="User profile picture">
                     </div>
-                    <img id="headerProfilePic" class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/40x40/E0E7FF/4338CA?text=U" alt="User profile picture">
-                    <button id="headerThemeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg id="themeIconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <svg id="themeIconMoon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-xl z-20">
+                        <a href="#" id="dropdownProfileLink" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Profile</a>
+                        <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                        <a href="#" id="headerLogoutBtn" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                    </div>
                 </div>
             </header>
 
@@ -150,12 +142,14 @@
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                             <div class="flex items-center mb-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">System Status</h4>
+                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">System Information</h4>
                             </div>
                             <p class="text-sm text-green-600 dark:text-green-400 font-semibold mb-4">All systems normal</p>
                             <div class="space-y-2 text-sm">
-                                <p class="text-gray-600 dark:text-gray-400">Disk Space: <span class="font-semibold text-gray-800 dark:text-gray-200">75% Used</span></p>
-                                <p class="text-gray-600 dark:text-gray-400">CPU Load: <span class="font-semibold text-gray-800 dark:text-gray-200">15%</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">Operating System: <span id="osInfo" class="font-semibold text-gray-800 dark:text-gray-200">Detecting...</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">Device Memory: <span id="memoryInfo" class="font-semibold text-gray-800 dark:text-gray-200">N/A</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">Processor: <span id="processorInfo" class="font-semibold text-gray-800 dark:text-gray-200">Detecting...</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">Browser: <span id="browserInfo" class="font-semibold text-gray-800 dark:text-gray-200">Detecting...</span></p>
                             </div>
                         </div>
                     </div>
@@ -167,6 +161,18 @@
                                 <button id="quickEditProfile" class="w-full text-left flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                     <span class="font-semibold">Edit Your Profile</span>
+                                </button>
+                                <button id="quickAiHelper" class="w-full text-left flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                                    <span class="font-semibold">Generate Content with AI</span>
+                                </button>
+                                <button id="quickAutomation" class="w-full text-left flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                                    <span class="font-semibold">View Automation Tools</span>
+                                </button>
+                                <button id="quickGameZone" class="w-full text-left flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <span class="font-semibold">Go to Game Zone</span>
                                 </button>
                             </div>
                         </div>
@@ -220,10 +226,13 @@
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Member Since</dt>
                                     <dd id="profileMemberSince" class="mt-1 text-lg text-gray-900 dark:text-gray-100">-</dd>
                                 </div>
-                                </dl>
+                            </dl>
                         </div>
-                        <div class="mt-8 border-t border-gray-200 pt-6 text-right">
-                            <button id="editProfileBtn" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition">
+                        <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6 flex justify-between items-center">
+                            <button id="profileLogoutBtn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition text-sm">
+                                Logout
+                            </button>
+                            <button id="editProfileBtn" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition text-sm">
                                 Edit Profile
                             </button>
                         </div>
@@ -258,25 +267,6 @@
                 <div id="settingsContent" class="hidden content-section">
                     <div class="space-y-8 max-w-4xl mx-auto">
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Appearance</h3>
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-md font-semibold text-gray-700 dark:text-gray-300">Interface Theme</span>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Select your preferred light or dark theme.</p>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-sm font-medium text-gray-600">Light</span>
-                                    <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" value="" id="theme-toggle" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-gray-800"></div>
-                                        <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-full"></span>
-                                    </label>
-                                    <span class="text-sm font-medium text-gray-600">Dark</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                             <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Notifications</h3>
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
@@ -302,15 +292,15 @@
                         <h3 class="text-5xl font-bold text-white" style="font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px #9333ea, 0 0 20px #9333ea;">TNVS Game Zone</h3>
                         <p class="text-purple-300 mt-2">Select a game to begin your adventure.</p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <!-- TNVS Car Game Card -->
-                        <div class="relative rounded-xl overflow-hidden shadow-2xl group interactive-card border-2 border-transparent hover:border-purple-500 transition-all duration-300">
+                        <div class="relative rounded-xl overflow-hidden shadow-2xl group interactive-card border-2 border-transparent hover:border-purple-50 transition-all duration-30">
                             <img src="images/need-for-speed-police-cars-racing-cars-3840x2160-2723.jpg" alt="TNVS Car Game" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>
                             <div class="relative z-10 h-full flex flex-col justify-end p-6">
-                                <h4 class="text-5xl font-bold text-white mb-500">Cyberpunk Racer</h4>
+                                <h4 class="text-2xl font-bold text-white mb-5">Cyberpunk Racer</h4>
                                 <p class="text-gray-200 text-sm">Dodge traffic in a high-speed race for survival.</p>
-                                <a href="../JavaSmallProjects/TNVScarGame.html" target="_blank" class="mt-4 inline-block bg-purple-10 text-white font-bold py-2 px-6 rounded-lg transform hover:scale-105 transition-transform">Play Now</a>
+                                <a href="TNVScarGame.html" target="_blank" class="mt-4 inline-block bg-purple-60 text-white font-bold py-2 px-2 rounded-lg transform hover:scale-105 transition-transform">Play Now</a>
                             </div>
                         </div>
                         <!-- Coming Soon Card -->
