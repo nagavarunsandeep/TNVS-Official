@@ -62,12 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // New Dashboard elements
     const welcomeMessage = document.getElementById('welcomeMessage');
-    const profileCompleteness = document.getElementById('profileCompleteness').querySelector('span');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const dateDisplay = document.getElementById('dateDisplay');
     const quickEditProfile = document.getElementById('quickEditProfile');
     const quickAiHelper = document.getElementById('quickAiHelper');
     const quickAutomation = document.getElementById('quickAutomation');
     const quickGameZone = document.getElementById('quickGameZone');
-    const automationTaskCount = document.getElementById('automationTaskCount');
+    const locationInfo = document.getElementById('locationInfo');
 
     // To-Do List elements
     const taskForm = document.getElementById('taskForm');
@@ -367,9 +368,6 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
     });
 
-    // Count automation tasks and update the dashboard card
-    updateAutomationTaskCount();
-    
     function updateWelcomeMessage(name) {
         const hour = new Date().getHours();
         let greeting = "Welcome";
@@ -383,23 +381,58 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         welcomeMessage.textContent = `${greeting}, ${name}!`;
     }
 
-    function calculateProfileCompleteness(user, userData) {
-        let score = 0;
-        const totalPoints = 2;
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const displayName = user.displayName || 'User';
+            updateWelcomeMessage(displayName);
+            headerUserName.textContent = displayName;
+            const photoURL = user.photoURL || `https://placehold.co/128x128/E0E7FF/4338CA?text=${displayName.charAt(0)}`;
+    
+            // Populate profile page and header
+            populateProfileData(user, displayName, photoURL);
+            
+            // Initialize dashboard widgets
+            initializeDashboardWidgets();
+        } else {
+            window.location.href = 'auth.html';
+        }
+    });
 
-        // Point for having a non-default display name
-        if (userData.displayName && userData.displayName !== 'User') score++;
-        // Point for having a custom profile picture (not a placeholder)
-        if (userData.photoURL && !userData.photoURL.includes('placehold.co')) score++;
+    function updateClock() {
+        const now = new Date();
+        
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        timeDisplay.textContent = now.toLocaleTimeString('en-US', timeOptions);
 
-        const percentage = Math.round((score / totalPoints) * 100);
-        profileCompleteness.textContent = `${percentage}%`;
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateDisplay.textContent = now.toLocaleDateString('en-US', dateOptions);
     }
 
-    function updateAutomationTaskCount() {
-        const tasks = automationContent.querySelectorAll('.interactive-card');
-        const count = tasks.length;
-        automationTaskCount.textContent = `${count} Available`;
+    function updateLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    // Use a free reverse geocoding API (Nominatim)
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                    const data = await response.json();
+                    if (data && data.address) {
+                        const city = data.address.city || data.address.town || data.address.village || 'Unknown City';
+                        const country = data.address.country || 'Unknown Country';
+                        locationInfo.textContent = `${city}, ${country}`;
+                    } else {
+                        locationInfo.textContent = "Location not found";
+                    }
+                } catch (error) {
+                    console.error("Error fetching location name:", error);
+                    locationInfo.textContent = "Could not fetch name";
+                }
+            }, () => {
+                locationInfo.textContent = "Permission denied";
+            });
+        } else {
+            locationInfo.textContent = "Not supported";
+        }
     }
 
     // --- System Information Logic ---
@@ -480,6 +513,32 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             browserInfo.textContent = browser;
         }
     }
+
+    function populateProfileData(user, displayName, photoURL) {
+        // Populate profile page
+        profilePicture.src = photoURL;
+        profileName.textContent = displayName;
+        profileEmail.textContent = user.email;
+        profileDetailName.textContent = displayName;
+        profileDetailEmail.textContent = user.email;
+
+        // Get creation date from Auth user metadata
+        if (user.metadata.creationTime) {
+            const creationDate = new Date(user.metadata.creationTime);
+            profileMemberSince.textContent = creationDate.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+
+        // Populate header profile pic
+        headerProfilePic.src = photoURL;
+    }
+
+    function initializeDashboardWidgets() {
+        updateSystemInfo();
+        updateLocation();
+        setInterval(updateClock, 1000);
+    }
     // --- To-Do List (My Tasks) Logic ---
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -552,7 +611,6 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
 
     // Initial render of tasks
     renderTasks();
-    updateSystemInfo();
 
     // --- AI Content Helper Logic ---
     generateAiContentBtn.addEventListener('click', () => {
