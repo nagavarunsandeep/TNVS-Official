@@ -46,7 +46,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    TNVS Game
+                    TNVS Games
                 </a>
                 <a href="#" id="settingsLink" class="sidebar-link">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -116,16 +116,19 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                        <!-- Current Time Card -->
+                        <!-- WiFi Details Card -->
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center">
                             <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-full mr-6">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071a10 10 0 0114.142 0M1.394 8.536a15 15 0 0121.212 0" />
                                 </svg>
                             </div>
                             <div>
-                                <h4 id="timeDisplay" class="text-2xl font-bold text-gray-800 dark:text-gray-100">Loading...</h4>
-                                <p id="dateDisplay" class="text-gray-600 dark:text-gray-400">Loading...</p>
+                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Network Status</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Type: <span id="connectionType" class="font-semibold text-gray-700 dark:text-gray-200">Detecting...</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">Speed: <span id="connectionSpeed" class="font-semibold text-gray-700 dark:text-gray-200">N/A</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">IP Address: <span id="ipAddress" class="font-semibold text-gray-700 dark:text-gray-200">Detecting...</span></p>
+                                <p class="text-gray-600 dark:text-gray-400">SSID: <span class="font-semibold text-gray-700 dark:text-gray-200">Protected</span></p>
                             </div>
                         </div>
                         <!-- Current Location Card -->
@@ -191,6 +194,9 @@
                             </form>
                             <div id="taskList" class="space-y-3 max-h-60 overflow-y-auto pr-2">
                                 </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button data-feature="Dashboard" class="report-issue-btn text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Report an issue with this feature</button>
                         </div>
                     </div>
                 </div>
@@ -260,6 +266,9 @@
                             <h4 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Generated Content</h4>
                             <div class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"></div>
                         </div>
+                        <div class="mt-4 text-center">
+                            <button data-feature="AI Helper" class="report-issue-btn text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Report an issue with this feature</button>
+                        </div>
                     </div>
                 </div>
 
@@ -279,9 +288,24 @@
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Security</h3>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-md font-semibold text-gray-700 dark:text-gray-300">Password</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Change your account password.</p>
+                                </div>
+                                <button id="changePasswordBtn" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Change</button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                             <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Account Management</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Manage your account settings and data.</p>
-                            <button class="w-full sm:w-auto bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition">Delete Account</button>
+                            <div class="flex flex-wrap gap-4">
+                                <button id="deleteAccountBtn" class="w-full sm:w-auto bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition">Delete Account</button>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button data-feature="Settings" class="report-issue-btn text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Report an issue with this feature</button>
                         </div>
                     </div>
                 </div>
@@ -297,11 +321,34 @@
                             <img src="images/need-for-speed-police-cars-racing-cars-3840x2160-2723.jpg" alt="TNVS Car Game" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                             <div class="relative z-10 h-full flex flex-col justify-end p-6">
-                                <h4 class="text-2xl font-bold text-white">Traffic Racer</h4>
-                                <p class="text-gray-200 text-sm">Dodge traffic in a high-speed race for survival.</p>
+                                <h4 class="text-2xl font-bold text-white">Real Car Driving</h4>
+                                <p class="text-gray-200 text-sm">Experience the thrill of high-speed Car Driving.</p>
                                 <a href="#" onclick="window.open('https://games.crazygames.com/en_US/racing-limits/index.html', 'RacingLimitsGame', 'fullscreen=yes,scrollbars=no'); return false;" class="mt-4 inline-block bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transform hover:scale-105 transition-transform self-start">Play Now</a>
                             </div>
                         </div>
+                        <!-- Real Bike Driving Game Card -->
+                        <div class="relative rounded-xl overflow-hidden shadow-2xl group interactive-card border-2 border-transparent hover:border-purple-500 transition-all duration-300 h-80">
+                            <img src="images/wp2513939-bike-race-wallpapers.jpg" alt="TNVS Bike Game" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="relative z-10 h-full flex flex-col justify-end p-6">
+                                <h4 class="text-2xl font-bold text-white">Real Bike Driving</h4>
+                                <p class="text-gray-200 text-sm">Experience the thrill of high-speed Bike Driving.</p>
+                                <a href="#" onclick="window.open('https://games.crazygames.com/en_US/traffic-rider-vvq/index.html', 'BikeRacingGame', 'fullscreen=yes,scrollbars=no'); return false;" class="mt-4 inline-block bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transform hover:scale-105 transition-transform self-start">Play Now</a>
+                            </div>
+                        </div>
+                        <!-- Chess Game Card -->
+                        <div class="relative rounded-xl overflow-hidden shadow-2xl group interactive-card border-2 border-transparent hover:border-purple-500 transition-all duration-300 h-80">
+                            <img src="images/1000_F_1712315009_fcmhhOiM7XDD1czINDgcPDrDVcPZUEWs.jpg" alt="Chess Game" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="relative z-10 h-full flex flex-col justify-end p-6">
+                                <h4 class="text-2xl font-bold text-white">Master Chess</h4>
+                                <p class="text-gray-200 text-sm">Challenge your mind with the classic game of chess.</p>
+                                <a href="#" onclick="window.open('https://games.crazygames.com/en_US/sparkchess/index.html', 'ChessGame', 'fullscreen=yes,scrollbars=no'); return false;" class="mt-4 inline-block bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transform hover:scale-105 transition-transform self-start">Play Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center">
+                        <button data-feature="Game Zone" class="report-issue-btn text-sm text-gray-400 dark:text-gray-300 hover:text-purple-400 transition">Report an issue with the Game Zone</button>
                     </div>
                 </div>
 
@@ -361,11 +408,96 @@
                                 <button id="runGreeterScriptBtn" class="w-full bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-cyan-700 transition">Download & Run</button>
                             </div>
                         </div>
+                        <div class="mt-8 text-center md:col-span-2 lg:col-span-3">
+                            <button data-feature="Windows Automation" class="report-issue-btn text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Report an issue with this feature</button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </main>
     </div>
+
+    <!-- Report Issue Modal -->
+    <div id="reportIssueModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">Report an Issue</h3>
+                <button id="closeReportModalBtn" class="text-2xl text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+            </div>
+            <form id="reportIssueForm">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">You are reporting an issue for: <strong id="reportFeatureName" class="text-indigo-500"></strong></p>
+                <textarea id="issueDescription" rows="5" placeholder="Please describe the issue in detail..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="button" id="cancelReportBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                    <button type="submit" id="submitReportBtn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">Change Password</h3>
+                <button id="closePasswordModalBtn" class="text-2xl text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+            </div>
+            <form id="changePasswordForm" class="space-y-4">
+                <div class="relative">
+                    <input id="currentPassword" type="password" placeholder="Current Password" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12" required>
+                    <button type="button" id="toggleCurrentPassword" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        <svg class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 .47 0 .927.038 1.372.113M15.98 8.04A6.002 6.002 0 0012 6c-3.314 0-6 2.686-6 6a6.002 6.002 0 002.04 4.02m5.94-5.94a3 3 0 10-4.243 4.243M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                </div>
+                <div class="relative">
+                    <input id="newPassword" type="password" placeholder="New Password" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12" required>
+                    <button type="button" id="toggleNewPassword" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        <svg class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 .47 0 .927.038 1.372.113M15.98 8.04A6.002 6.002 0 0012 6c-3.314 0-6 2.686-6 6a6.002 6.002 0 002.04 4.02m5.94-5.94a3 3 0 10-4.243 4.243M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                </div>
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="button" id="cancelPasswordChangeBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                    <button type="submit" id="submitPasswordChangeBtn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-red-600">Delete Account</h3>
+                <button id="closeDeleteModalBtn" class="text-2xl text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">This action is permanent and cannot be undone. All your data will be deleted. To confirm, please enter your password.</p>
+            <form id="deleteAccountForm" class="space-y-4">
+                <div class="relative">
+                    <input id="deletePassword" type="password" placeholder="Enter your password to confirm" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-12" required>
+                    <button type="button" id="toggleDeletePassword" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        <svg class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 .47 0 .927.038 1.372.113M15.98 8.04A6.002 6.002 0 0012 6c-3.314 0-6 2.686-6 6a6.002 6.002 0 002.04 4.02m5.94-5.94a3 3 0 10-4.243 4.243M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                </div>
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="button" id="cancelDeleteBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                    <button type="submit" id="confirmDeleteBtn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition w-48 flex justify-center">
+                        <span class="button-text">Delete My Account</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="hidden fixed top-5 right-5 bg-gray-800 text-white py-3 px-5 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <p id="toast-message"></p>
+    </div>
+
 
     <script type="module" src="dashboard_logic.js"></script>
 
