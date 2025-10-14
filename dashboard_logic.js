@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, updateProfile, updateEmail } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut, updateProfile, updateEmail, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const firebaseConfig = {
@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = getAuth(app);
     const storage = getStorage(app);
     const db = getFirestore(app);
+
+    // Define admin users by their email.
+    const ADMIN_EMAILS = ['nagavarunsandeep@gmail.com', 'youremail@example.com']; // This can be removed if not used elsewhere
+
     const sidebar = document.getElementById('sidebar');
     
     const headerUserName = document.getElementById('headerUserName');
@@ -39,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const automationLink = document.getElementById('automationLink');
     const aiHelperLink = document.getElementById('aiHelperLink');
     const gameLink = document.getElementById('gameLink');
-    
     const settingsLink = document.getElementById('settingsLink');
+
     // Profile detail elements
     const profilePicture = document.getElementById('profilePicture');
     const profileName = document.getElementById('profileName');
@@ -62,8 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // New Dashboard elements
     const welcomeMessage = document.getElementById('welcomeMessage');
-    const timeDisplay = document.getElementById('timeDisplay');
-    const dateDisplay = document.getElementById('dateDisplay');
     const quickEditProfile = document.getElementById('quickEditProfile');
     const quickAiHelper = document.getElementById('quickAiHelper');
     const quickAutomation = document.getElementById('quickAutomation');
@@ -94,6 +96,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const memoryInfo = document.getElementById('memoryInfo');
     const processorInfo = document.getElementById('processorInfo');
     const browserInfo = document.getElementById('browserInfo');
+
+    // Report Issue Modal elements
+    const reportIssueModal = document.getElementById('reportIssueModal');
+    const reportModalContent = reportIssueModal.querySelector('div');
+    const closeReportModalBtn = document.getElementById('closeReportModalBtn');
+    const cancelReportBtn = document.getElementById('cancelReportBtn');
+    const reportIssueForm = document.getElementById('reportIssueForm');
+    const reportFeatureName = document.getElementById('reportFeatureName');
+    const issueDescription = document.getElementById('issueDescription');
+    const submitReportBtn = document.getElementById('submitReportBtn');
+
+    // Toast Notification elements
+    const toastNotification = document.getElementById('toast-notification');
+    const toastMessage = document.getElementById('toast-message');
+
+    // Settings Page elements
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
+
+    // Change Password Modal elements
+    const changePasswordModal = document.getElementById('changePasswordModal');
+    const passwordModalContent = changePasswordModal.querySelector('div');
+    const closePasswordModalBtn = document.getElementById('closePasswordModalBtn');
+    const cancelPasswordChangeBtn = document.getElementById('cancelPasswordChangeBtn');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+
+    // Delete Account Modal elements
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    const deleteAccountModal = document.getElementById('deleteAccountModal');
+    const deleteModalContent = deleteAccountModal.querySelector('div');
+    const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const deleteAccountForm = document.getElementById('deleteAccountForm');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
     function showSection(sectionToShow, activeLink) {
         // Hide all sections
@@ -339,35 +374,6 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
     }
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const displayName = user.displayName || 'User';
-            headerUserName.textContent = displayName;
-            welcomeMessage.textContent = `Welcome, ${displayName}!`;
-            const photoURL = user.photoURL || `https://placehold.co/128x128/E0E7FF/4338CA?text=${displayName.charAt(0)}`;
-    
-            // Populate profile page
-            profilePicture.src = photoURL;
-            profileName.textContent = displayName;
-            profileEmail.textContent = user.email;
-            profileDetailName.textContent = displayName;
-            profileDetailEmail.textContent = user.email;
-    
-            // Get creation date from Auth user metadata (this is more reliable)
-            if (user.metadata.creationTime) {
-                const creationDate = new Date(user.metadata.creationTime);
-                profileMemberSince.textContent = creationDate.toLocaleDateString('en-US', {
-                    year: 'numeric', month: 'long', day: 'numeric'
-                });
-            }
-
-            // Populate header profile pic
-            headerProfilePic.src = photoURL;
-        } else {
-            window.location.href = 'auth.html';
-        }
-    });
-
     function updateWelcomeMessage(name) {
         const hour = new Date().getHours();
         let greeting = "Welcome";
@@ -381,32 +387,87 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         welcomeMessage.textContent = `${greeting}, ${name}!`;
     }
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const displayName = user.displayName || 'User';
-            updateWelcomeMessage(displayName);
-            headerUserName.textContent = displayName;
-            const photoURL = user.photoURL || `https://placehold.co/128x128/E0E7FF/4338CA?text=${displayName.charAt(0)}`;
-    
-            // Populate profile page and header
-            populateProfileData(user, displayName, photoURL);
-            
-            // Initialize dashboard widgets
-            initializeDashboardWidgets();
-        } else {
-            window.location.href = 'auth.html';
-        }
-    });
-
-    function updateClock() {
-        const now = new Date();
-        
-        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-        timeDisplay.textContent = now.toLocaleTimeString('en-US', timeOptions);
-
-        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateDisplay.textContent = now.toLocaleDateString('en-US', dateOptions);
+    function initializeFeatureEventListeners() {
+        // This function will be called only after auth is confirmed.
+        // It sets up listeners for features that might need user data.
+        initializeReportIssueLogic();
     }
+
+    // --- Toast Notification Logic ---
+    let toastTimeout;
+    function showToast(message, isError = false) {
+        clearTimeout(toastTimeout);
+        toastMessage.textContent = message;
+        toastNotification.classList.toggle('bg-red-600', isError);
+        toastNotification.classList.toggle('bg-gray-800', !isError);
+        toastNotification.classList.remove('hidden');
+        setTimeout(() => toastNotification.classList.remove('translate-x-full'), 10);
+
+        toastTimeout = setTimeout(() => {
+            toastNotification.classList.add('hidden');
+            toastNotification.classList.add('translate-x-full');
+            setTimeout(() => toastNotification.classList.add('hidden'), 300);
+        }, 4000);
+    }
+
+    function toggleButtonLoading(button, isLoading) {
+        const buttonText = button.querySelector('.button-text');
+        const spinner = button.querySelector('.spinner');
+
+        button.disabled = isLoading;
+        if (spinner) spinner.classList.toggle('hidden', !isLoading);
+        if (buttonText) buttonText.classList.toggle('hidden', isLoading);
+    }
+
+
+    async function updateNetworkInfo() {
+        const connectionTypeEl = document.getElementById('connectionType');
+        const connectionSpeedEl = document.getElementById('connectionSpeed');
+    
+        // Update connection type (this is static and fine)
+        if (navigator.connection) {
+            const connection = navigator.connection;
+            connectionTypeEl.textContent = connection.effectiveType.toUpperCase();
+        } else {
+            connectionTypeEl.textContent = 'Unknown';
+        }
+    
+        // --- Real-time speed test ---
+        try {
+            const imageAddr = "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg"; // A reasonably sized image
+            const downloadSize = 587238; // Size of the image in bytes
+            const startTime = (new Date()).getTime();
+            
+            // Use a cache-busting query parameter to ensure a fresh download
+            const response = await fetch(imageAddr + "?n=" + Math.random());
+            await response.blob(); // Ensure the image is fully downloaded
+            
+            const endTime = (new Date()).getTime();
+            const duration = (endTime - startTime) / 1000; // seconds
+            const bitsLoaded = downloadSize * 8;
+            const speedBps = (bitsLoaded / duration).toFixed(2);
+            const speedKbps = (speedBps / 1024).toFixed(2);
+            const speedMbps = (speedKbps / 1024).toFixed(2);
+    
+            connectionSpeedEl.textContent = `${speedMbps} Mbps`;
+        } catch (error) {
+            console.error("Speed test error:", error);
+            connectionSpeedEl.textContent = "N/A";
+        }
+    }
+
+    async function updateIpAddress() {
+        const ipAddressEl = document.getElementById('ipAddress');
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            ipAddressEl.textContent = data.ip;
+        } catch (error) {
+            console.error("Could not fetch IP address:", error);
+            ipAddressEl.textContent = "Unavailable";
+        }
+    }
+
 
     function updateLocation() {
         if (navigator.geolocation) {
@@ -537,9 +598,10 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
     function initializeDashboardWidgets() {
         updateSystemInfo();
         updateLocation();
-        setInterval(updateClock, 1000);
+        updateIpAddress(); // Fetch the IP address on load
+        updateNetworkInfo(); // Initial call
+        setInterval(updateNetworkInfo, 3000); // Update every 3 seconds for a real-time feel
     }
-    // --- To-Do List (My Tasks) Logic ---
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
     function saveTasks() {
@@ -816,93 +878,93 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
 
         // --- General questions from TNVS Main Site ---
         if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-            return "Hello there! How can I assist you with TNVS Official today?";
+            return "Hello! I'm the TNVS AI Assistant. I can help you with questions about the dashboard, your profile, or available features. What can I do for you?";
         }
         if (lowerInput.includes('services')) {
-            return 'We offer various services including web development, app development, and digital marketing. The dashboard also provides access to Windows Automation tools.';
+            return 'This dashboard provides access to Windows Automation tools, an AI Content Helper, and the TNVS Game Zone. For our full range of business services like web development, please visit our main website.';
         }
 
         // --- Dashboard-specific questions ---
         if (lowerInput.includes('dashboard') || lowerInput.includes('overview')) {
-            return "The main dashboard gives you an overview and quick access to our YouTube channel. You can navigate to other sections using the sidebar on the left.";
+            return "You're on the main dashboard! It gives you a quick overview with widgets for time, location, and system info. You can also manage your tasks and use the quick action buttons to jump to other sections.";
         }
         if (lowerInput.includes('profile')) {
-            return "You can view and manage your profile by clicking on the 'Profile' link in the sidebar. You can update your photo there.";
+            return "You can view and manage your profile by clicking 'Profile' in the sidebar. There, you can update your name and profile picture.";
         }
         if (lowerInput.includes('change my photo') || lowerInput.includes('update picture')) {
-            return "To change your profile picture, go to the 'Profile' page, hover over your current photo, and click the camera icon to upload a new one.";
+            return "To change your profile picture, go to the 'Profile' page, hover over your current photo, and click the camera icon that appears to upload a new one.";
         }
         if (lowerInput.includes('settings')) {
-            return "The 'Settings' page is where you'll be able to configure your account preferences. This section is currently under construction.";
+            return "The 'Settings' page allows you to manage notification preferences, change your password, and delete your account. You can find it in the sidebar.";
         }
-        if (lowerInput.includes('analytics')) {
-            return "The 'Analytics' page will provide insights and data about your activities. This feature is coming soon!";
+        if (lowerInput.includes('change password')) {
+            return "You can change your password in the 'Settings' section. Click on 'Settings' in the sidebar, then find the 'Security' section and click the 'Change' button.";
+        }
+        if (lowerInput.includes('delete my account') || lowerInput.includes('delete account')) {
+            return "You can delete your account from the 'Settings' page. Please be careful, as this action is permanent. You will be asked to enter your password to confirm the deletion.";
         }
         if (lowerInput.includes('automation')) {
-            return "The 'Windows Automation' section allows you to manage tasks like File Organizer and Scheduled Tasks. What would you like to know more about?";
+            return "The 'Windows Automation' section contains tools to automate tasks on your computer. You can download a script to greet you, launch the Photo Virus file organizer, and more. What would you like to know?";
         }
         if (lowerInput.includes('photo virus')) {
-            return "The Photo Virus is a tool to automatically sort your files into folders based on rules you define. You can launch it from the 'Windows Automation' section.";
+            return "The 'Photo Virus' is a powerful tool that automatically sorts your files into organized folders. You can launch it from the 'Windows Automation' section.";
         }
         if (lowerInput.includes('scheduled tasks')) {
-            return "Scheduled Tasks let you run scripts or applications automatically at specific times or intervals. You can configure them in the 'Windows Automation' section.";
+            return "The 'Scheduled Tasks' tool lets you run scripts or applications automatically at specific times. You can configure them in the 'Windows Automation' section.";
         }
         if (lowerInput.includes('data entry bot')) {
-            return "The Data Entry Bot helps automate repetitive data entry tasks, saving you time. You can find it under 'Windows Automation'.";
+            return "The 'Data Entry Bot' helps automate repetitive data entry tasks, saving you time and reducing errors. You can find it in the 'Windows Automation' section.";
         }
         if (lowerInput.includes('logout') || lowerInput.includes('sign out')) {
-            return "To log out, simply click the 'Logout' button at the bottom of the sidebar.";
+            return "You can log out by clicking the 'Logout' button at the bottom of the sidebar, or by clicking your profile picture in the top-right corner and selecting 'Logout' from the dropdown.";
         }
         if (lowerInput.includes('system cleanup')) {
-            return "The System Cleanup tool helps you free up disk space by removing temporary files and cache. You can run it from the 'Windows Automation' section.";
+            return "The 'System Cleanup' tool helps you free up disk space by removing temporary files and cache. You can run it from the 'Windows Automation' section.";
         }
         if (lowerInput.includes('automated backup')) {
-            return "The Automated Backup tool lets you schedule regular backups of your important files to a secure location, protecting your data. Find it in the 'Windows Automation' section.";
+            return "The 'Automated Backup' tool lets you schedule regular backups of your important files to a secure location, protecting your data. Find it in the 'Windows Automation' section.";
         }
         if (lowerInput.includes('greeter script')) {
-            return "The User Greeter Script is a fun VBScript file you can download from the 'Windows Automation' page. When you run it, it shows a personalized welcome message with your name!";
+            return "The 'User Greeter Script' is a fun VBScript file you can download from the 'Windows Automation' page. When you run it, it shows a personalized welcome message with your name!";
         }
         if (lowerInput.includes('what can i ask the ai helper')) {
-            return "You can ask the AI Helper to 'write a professional email', 'create a blog post intro', 'give youtube script ideas', or even 'draft a product description'. Just type your request in the AI Helper section!";
+            return "You can ask the AI Helper to do many things! Try prompts like: 'write a professional email', 'create a blog post intro', 'give me YouTube script ideas', or 'draft a product description'. Just type your request in the 'AI Helper' section!";
         }
         if (lowerInput.includes('help') || lowerInput.includes('what can you do')) {
-            return "I can help with questions about your profile, automation tasks, or navigating the dashboard. For example, try asking 'How do I change my photo?' or 'Tell me about the data entry bot'.";
+            return "I can help with questions about your profile, automation tasks, or navigating the dashboard. For example, try asking 'How do I change my photo?', 'Tell me about the data entry bot', or 'How do I play games?'.";
         }
         if (lowerInput.includes('task') || lowerInput.includes('to-do')) {
-            return "You can manage your tasks in the 'My Tasks' section on the main dashboard. Just type in the input field to add a new task, or use the buttons to mark them as complete or delete them.";
+            return "You can manage your to-do list in the 'My Tasks' section on the main dashboard. Just type in the input field to add a new task, and use the buttons to mark it as complete or delete it.";
         }
         if (lowerInput.includes('ai helper')) {
-            return "The AI Helper can generate content for you! Go to the 'AI Helper' section, type a prompt like 'write a blog post intro', and click 'Generate'.";
+            return "The AI Helper can generate content for you! Go to the 'AI Helper' section in the sidebar, type a prompt like 'write a blog post intro about AI', and click 'Generate'.";
         }
         if (lowerInput.includes('sidebar') || lowerInput.includes('menu')) {
-            return "You can collapse the sidebar by clicking the arrow button at the bottom. When it's collapsed, a similar button will appear at the top of the main content area to expand it again.";
-        }
-        if (lowerInput.includes('profile completeness') || lowerInput.includes('profile status')) {
-            return "The profile completeness score on your dashboard increases when you add a display name and a custom profile picture. A complete profile helps personalize your experience!";
+            return "You can collapse the sidebar by clicking the double-arrow button in the header. When it's collapsed, a similar button will appear to expand it again.";
         }
         if (lowerInput.includes('how are you')) {
-            return "I'm a bot, but I'm doing great! Ready to help you with any questions about the dashboard.";
+            return "I'm a bot, but I'm doing great! Ready to help you with any questions about the TNVS dashboard.";
         }
         if (lowerInput.includes('youtube') || lowerInput.includes('channel')) {
             return 'You can find our official channel on the dashboard. There is a "Subscribe" button that will take you right there!';
         }
         if (lowerInput.includes('thank you') || lowerInput.includes('thanks')) {
-            return "You're welcome! Is there anything else I can help you with?";
+            return "You're welcome! Is there anything else I can assist you with?";
         }
         if (lowerInput.includes('about tnvs') || lowerInput.includes('about')) {
-            return 'TNVS is a technology company focused on delivering innovative solutions. This dashboard is where you can manage your profile and access exclusive automation tools.';
+            return 'TNVS Official is a technology company focused on delivering innovative solutions. This dashboard is your personal hub to manage your profile and access exclusive automation tools and games.';
         }
         if (lowerInput.includes('who are you')) {
-            return "I am the TNVS AI Assistant, designed to help you use this dashboard. How can I assist you?";
+            return "I am the TNVS AI Assistant, your personal guide for this dashboard. How can I help you today?";
         }
         if (lowerInput.includes('get started')) {
-            return 'You are already here! This dashboard is the best place to start. Explore the sections on the left to see what you can do.';
+            return 'You are in the right place! This dashboard is the best place to start. Explore the sections on the left to see what you can do, or ask me a question like "What is the AI Helper?".';
         }
         if (lowerInput.includes('bye') || lowerInput.includes('goodbye')) {
             return "Goodbye! Feel free to reach out if you need anything else.";
         }
         if (lowerInput.includes('game') || lowerInput.includes('how to play')) {
-            return "The TNVS Game Zone features exciting games like Cyberpunk Racer. You can access it by clicking 'TNVS Game' in the sidebar!";
+            return "The TNVS Game Zone features exciting games like Real Car Driving, Real Bike Driving, and Master Chess. You can access it by clicking 'TNVS Games' in the sidebar! Once there, just click 'Play Now' on any game card.";
         }
         if (lowerInput.includes('contact')) {
             return "Contact us 9959933166";
@@ -910,4 +972,228 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
 
         return "I'm sorry, I'm not sure how to answer that yet. I am still learning. You can try asking about your profile or automation tasks.";
     }
+
+    // --- Report an Issue Logic ---
+    function initializeReportIssueLogic() {
+        const reportButtons = document.querySelectorAll('.report-issue-btn');
+        let currentFeatureToReport = '';
+
+        function openReportModal(featureName) {
+            currentFeatureToReport = featureName;
+            reportFeatureName.textContent = featureName;
+            reportIssueModal.classList.remove('hidden');
+            setTimeout(() => {
+                reportModalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+
+        function closeReportModal() {
+            reportModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                reportIssueModal.classList.add('hidden');
+                reportIssueForm.reset();
+            }, 300);
+        }
+
+        reportButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const feature = button.getAttribute('data-feature');
+                openReportModal(feature);
+            });
+        });
+
+        closeReportModalBtn.addEventListener('click', closeReportModal);
+        cancelReportBtn.addEventListener('click', closeReportModal);
+
+        reportIssueForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const description = issueDescription.value.trim();
+            if (!description) {
+                showToast('Please describe the issue.', true);
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) {
+                showToast('You must be logged in to report an issue.', true);
+                return;
+            }
+
+            submitReportBtn.disabled = true;
+            submitReportBtn.textContent = 'Submitting...';
+
+            try {
+                const issuesCollectionRef = collection(db, 'issues');
+                await addDoc(issuesCollectionRef, {
+                    feature: currentFeatureToReport,
+                    description: description,
+                    userId: user.uid,
+                    userEmail: user.email,
+                    reportedAt: serverTimestamp()
+                });
+                showToast('Thank you! Your issue has been reported successfully.');
+                closeReportModal();
+            } catch (error) {
+                console.error("Error reporting issue:", error);
+                showToast('Failed to submit your report. Please try again.', true);
+            } finally {
+                submitReportBtn.disabled = false;
+                submitReportBtn.textContent = 'Submit Report';
+            }
+        });
+    }
+
+    // --- Settings Page Logic ---
+    function initializeSettings() {
+        // Password visibility toggles for change password modal
+        const toggleCurrentPassword = document.getElementById('toggleCurrentPassword');
+        const currentPasswordInput = document.getElementById('currentPassword');
+        toggleCurrentPassword.addEventListener('click', () => {
+            const type = currentPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            currentPasswordInput.setAttribute('type', type);
+            toggleCurrentPassword.querySelectorAll('svg').forEach(icon => icon.classList.toggle('hidden'));
+        });
+
+        const toggleNewPassword = document.getElementById('toggleNewPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        toggleNewPassword.addEventListener('click', () => {
+            const type = newPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            newPasswordInput.setAttribute('type', type);
+            toggleNewPassword.querySelectorAll('svg').forEach(icon => icon.classList.toggle('hidden'));
+        });
+
+        // Change Password Modal
+        changePasswordBtn.addEventListener('click', () => {
+            changePasswordModal.classList.remove('hidden');
+            setTimeout(() => {
+                passwordModalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        });
+
+        function closePasswordModal() {
+            passwordModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                changePasswordModal.classList.add('hidden');
+                changePasswordForm.reset();
+            }, 300);
+        }
+
+        closePasswordModalBtn.addEventListener('click', closePasswordModal);
+        cancelPasswordChangeBtn.addEventListener('click', closePasswordModal);
+
+        changePasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (!user || !currentPassword || !newPassword) {
+                showToast('Please fill out all fields.', true);
+                return;
+            }
+
+            const credential = EmailAuthProvider.credential(user.email, currentPassword);
+
+            try {
+                await reauthenticateWithCredential(user, credential);
+                await updatePassword(user, newPassword);
+                showToast('Password updated successfully!');
+                closePasswordModal();
+            } catch (error) {
+                console.error("Password change error:", error);
+                showToast('Failed to change password. Please check your current password.', true);
+            }
+        });
+
+        // Password visibility toggle for delete account modal
+        const toggleDeletePassword = document.getElementById('toggleDeletePassword');
+        const deletePasswordInput = document.getElementById('deletePassword');
+        toggleDeletePassword.addEventListener('click', () => {
+            const type = deletePasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            deletePasswordInput.setAttribute('type', type);
+            toggleDeletePassword.querySelectorAll('svg').forEach(icon => icon.classList.toggle('hidden'));
+        });
+
+        // Delete Account Modal
+        deleteAccountBtn.addEventListener('click', () => {
+            deleteAccountModal.classList.remove('hidden');
+            setTimeout(() => {
+                deleteModalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        });
+
+        function closeDeleteModal() {
+            deleteModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                deleteAccountModal.classList.add('hidden');
+                deleteAccountForm.reset();
+            }, 300);
+        }
+
+        closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+        deleteAccountForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            const password = document.getElementById('deletePassword').value;
+
+            if (!user || !password) {
+                showToast('Password is required to delete your account.', true);
+                return;
+            }
+
+            toggleButtonLoading(confirmDeleteBtn, true);
+
+            const credential = EmailAuthProvider.credential(user.email, password);
+
+            try {
+                // Re-authenticate for security
+                await reauthenticateWithCredential(user, credential);
+
+                // If re-authentication is successful, proceed with deletion
+                const userId = user.uid;
+
+                // 1. Delete profile picture from Storage (if it exists)
+                const photoRef = ref(storage, `profile_pictures/${userId}`);
+                await deleteObject(photoRef).catch(err => console.warn("Could not delete photo, it might not exist.", err));
+
+                // 2. Delete user document from Firestore
+                const userDocRef = doc(db, "users", userId);
+                await deleteDoc(userDocRef);
+
+                // 3. Delete the user from Firebase Authentication
+                await deleteUser(user);
+
+                // Redirect will be handled by onAuthStateChanged
+
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                toggleButtonLoading(confirmDeleteBtn, false);
+                showToast('Incorrect password or error deleting account.', true);
+            }
+        });
+    }
+
+
+    // --- Main Authentication Flow ---
+    onAuthStateChanged(auth, (user) => {
+
+        if (user) {
+            const displayName = user.displayName || 'User';
+            updateWelcomeMessage(displayName);
+            headerUserName.textContent = displayName;
+            const photoURL = user.photoURL || `https://placehold.co/128x128/E0E7FF/4338CA?text=${displayName.charAt(0)}`;
+    
+            // Populate profile page and header
+            populateProfileData(user, displayName, photoURL);
+            
+            // Initialize dashboard widgets and event listeners that depend on user auth
+            initializeDashboardWidgets();
+            initializeFeatureEventListeners();
+            initializeSettings();
+        } else {
+            window.location.href = 'auth.html';
+        }
+    });
 });
