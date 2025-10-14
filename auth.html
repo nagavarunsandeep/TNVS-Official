@@ -8,14 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <link rel="stylesheet" href="styles.css">
-    <script type="module">
-        // These imports are used in the main script block below
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    </script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 auth-body">
 
-    <div class="bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="relative bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-md">
         <!-- Tab Controls to switch between Login and Sign Up -->
         <div class="flex p-2 bg-white/10 rounded-t-2xl">
             <button id="loginTab" class="w-1/2 py-3 font-semibold rounded-lg transition-all duration-300 tab-active">
@@ -291,16 +287,16 @@
             updateProfile,
             sendPasswordResetEmail
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration from the tnvs-site project
         const firebaseConfig = {
-            apiKey: "AIzaSyA3u_PaiNu_XdmGO4mNw3WXzE8CRJRxmik",
+            apiKey: "AIzaSyA3u_PaiNu_XdmGO4mNw3WXzE8CRJRxmik", // This seems to be the same, which is good.
             authDomain: "tnvs-site.firebaseapp.com",
             projectId: "tnvs-site",
-            storageBucket: "tnvs-site.appspot.com",
+            storageBucket: "tnvs-site.firebasestorage.app",
             messagingSenderId: "278029964442",
-            appId: "1:278029964442:web:f961a26ca0b20ea61b7b23",
+            appId: "1:278029964442:web:f961a26ca0b20ea61b7b23", // This seems to be the same.
             measurementId: "G-HZ3DZ31081"
         };
 
@@ -349,7 +345,7 @@
 
         function showMessage(message, isError = false, callback = null) {
             modalMessage.textContent = message;
-            modalMessage.style.color = isError ? '#dc2626' : '#1f2937'; // red-600 for error, gray-800 for success
+            modalMessage.style.color = isError ? '#dc2626' : '#16a34a'; // red-600 for error, green-600 for success
             onModalCloseCallback = callback;
             messageModal.classList.remove('hidden');
         }
@@ -389,28 +385,30 @@
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    // Update user profile with name
-                    return updateProfile(user, { displayName: name })
-                        .then(() => {
-                            // Save additional user info to Firestore
-                            const userDocRef = doc(db, "users", user.uid);
-                            return setDoc(userDocRef, {
-                                uid: user.uid,
-                                displayName: name,
-                                email: user.email,
-                                createdAt: new Date()
-                            });
+                    // First, update the main Auth profile with the display name
+                    return updateProfile(user, { displayName: name }).then(() => {
+                        // Then, save additional user info to Firestore
+                        const userDocRef = doc(db, "users", user.uid);
+                        return setDoc(userDocRef, {
+                            uid: user.uid,
+                            displayName: name,
+                            email: user.email,
+                            createdAt: serverTimestamp()
                         });
+                    }).then(() => {
+                        // Pass the user credential to the next step
+                        return userCredential;
+                    });
                 })
                 .then(() => {
                     toggleButtonLoading(signupButton, false);
-                    signupForm.reset();
-                    showMessage("Account created successfully! Redirecting to your dashboard...", false, () => {
-                        window.location.href = 'main_dashboard.html';
-                    });
+                    // Automatically sign the user in to ensure profile data is ready for the dashboard
+                    return signInWithEmailAndPassword(auth, email, password);
+                }).then(() => {
+                    window.location.href = 'dashboard.html'; // Redirect to welcome page
                 })
                 .catch((error) => {
-                    let friendlyMessage = 'An error occurred. Please try again.';
+                    let friendlyMessage = 'An unknown error occurred. Please try again.';
                     if (error.code === 'auth/email-already-in-use') {
                         friendlyMessage = 'This email is already in use. Please log in or use a different email.';
                     } else if (error.code === 'auth/weak-password') {
@@ -431,11 +429,9 @@
             toggleButtonLoading(loginButton, true);
 
             signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    toggleButtonLoading(loginButton, false);
-                    loginForm.reset();
-                    // On successful login, redirect to the dashboard
-                    window.location.href = 'main_dashboard.html';
+                .then(() => {
+                    // On successful login, redirect to the new welcome dashboard.
+                    window.location.href = 'dashboard.html';
                 })
                 .catch((error) => {
                     toggleButtonLoading(loginButton, false);
@@ -521,7 +517,7 @@
                             uid: user.uid,
                             displayName: name,
                             phoneNumber: user.phoneNumber,
-                            createdAt: new Date()
+                                createdAt: serverTimestamp() // Use server-side timestamp
                         });
                     });
             }).then(() => {
@@ -550,12 +546,15 @@
                     // Check if user is new, if so, create a document in Firestore
                     return getDoc(userDocRef).then(docSnap => {
                         if (!docSnap.exists()) {
-                            return setDoc(userDocRef, {
-                                uid: user.uid,
-                                displayName: user.displayName,
-                                email: user.email,
-                                createdAt: new Date()
-                    }).then(() => true); // Indicate new user
+                            // Also update the Auth profile for consistency
+                            return updateProfile(user, { displayName: user.displayName }).then(() => {
+                                return setDoc(userDocRef, {
+                                    uid: user.uid,
+                                    displayName: user.displayName,
+                                    email: user.email,
+                                    createdAt: serverTimestamp() // Use server-side timestamp
+                                }).then(() => true); // Indicate new user
+                            });
                         }
                 return false; // Indicate existing user
                     });
@@ -563,11 +562,11 @@
         .then((isNewUser) => {
             if (isNewUser) {
                 showMessage("Account created successfully! Redirecting to your dashboard...", false, () => {
-                    window.location.href = 'main_dashboard.html';
+                    window.location.href = 'dashboard.html';
                 });
             } else {
                 // On successful Google sign-in, redirect to the dashboard
-                window.location.href = 'main_dashboard.html';
+                window.location.href = 'dashboard.html';
             }
                 })
                 .catch((error) => {
