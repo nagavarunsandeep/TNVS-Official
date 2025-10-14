@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiPromptInput = document.getElementById('aiPromptInput');
     const aiContentOutput = document.getElementById('aiContentOutput');
     const aiContentContainer = aiContentOutput.querySelector('div');
+    let aiPromptSuggestionsContainer; // Will be created dynamically
 
     // Chatbot elements
     const chatbotToggle = document.getElementById('chatbot-toggle');
@@ -675,32 +676,42 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
     renderTasks();
 
     // --- AI Content Helper Logic ---
-    generateAiContentBtn.addEventListener('click', () => {
-        const prompt = aiPromptInput.value.trim();
-        if (!prompt) {
-            alert("Please enter a prompt for the AI.");
-            return;
-        }
-
-        aiContentOutput.classList.remove('hidden');
-        aiContentContainer.innerHTML = '<p>Generating...</p>';
-        generateAiContentBtn.disabled = true;
-
-        // Simulate an API call to an AI model
-        setTimeout(() => {
-            const response = getAiContentResponse(prompt);
-            aiContentContainer.innerHTML = response; // Use innerHTML to render line breaks
-            generateAiContentBtn.disabled = false;
-        }, 1500);
-    });
-
-    aiPromptInput.addEventListener('keydown', (e) => {
-        // Trigger generate on Enter key, but allow Shift+Enter for new lines
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            generateAiContentBtn.click();
-        }
-    });
+    const aiPromptSuggestions = [
+        'Write an email to a client',
+        'Write a thank you note',
+        'Create a social media post',
+        'List of ideas for a blog',
+        'Draft a professional email',
+        'Write a cover letter',
+        'Write a blog post intro',
+        'Create a product description',
+        'Draft an event invitation email',
+        'Write a customer service reply',
+        'Outline a business proposal',
+        'Generate slogan ideas',
+        'Create a YouTube script idea',
+        'Write a LinkedIn summary',
+        'Draft a job description',
+        'Write a press release',
+        'Create a meeting agenda',
+        'Write a follow-up email',
+        'Write an apology email',
+        'Write an email to my HOD',
+    ];
+    aiPromptSuggestions.push(
+        'Write a LinkedIn post about an achievement',
+        'Create a Twitter thread on productivity',
+        'Generate an Instagram caption for a team photo',
+        'Write a Facebook product announcement',
+        'Write ad copy for a new product',
+        'Explain a concept simply (ELI5)',
+        'Write a short story about adventure',
+        'Draft a birthday wish for a friend',
+        'Summarize a long text for me',
+        'Create a poll for social media',
+        'Write a product review',
+        'Brainstorm video ideas for YouTube'
+    );
 
     function getAiContentResponse(prompt) {
         const lowerPrompt = prompt.toLowerCase();
@@ -725,6 +736,80 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
                         <li>"A Beginner's Guide to VBScript"</li>
                     </ul>`;
         }
+        if (lowerPrompt.includes('linkedin post')) {
+            return `<p><strong>LinkedIn Post:</strong></p>
+                    <p>Thrilled to share that we've just launched a new feature on the TNVS Dashboard! This has been a huge team effort, and I'm incredibly proud of what we've accomplished. A big thank you to everyone involved!</p>
+                    <p>#Achievement #Teamwork #ProductLaunch #TNVS</p>`;
+        }
+        if (lowerPrompt.includes('twitter thread')) {
+            return `<p><strong>Twitter Thread Idea (1/3):</strong></p>
+                    <p>Want to boost your productivity? Here are 3 quick tips that have helped our team at TNVS:</p>
+                    <p>1. Use the Pomodoro Technique: 25 minutes of focused work, followed by a 5-minute break. It's a game-changer for maintaining focus.</p>
+                    <p>#Productivity #WorkHacks #Tips</p>`;
+        }
+        if (lowerPrompt.includes('instagram caption')) {
+            return `<p><strong>Instagram Caption:</strong></p>
+                    <p>Teamwork makes the dream work! ✨ So proud of this amazing group of people. We're working on some exciting things behind the scenes at TNVS. Stay tuned!</p>
+                    <p>#Team #WorkCulture #TNVS #BehindTheScenes #Tech</p>`;
+        }
+        if (lowerPrompt.includes('facebook announcement')) {
+            return `<p><strong>Facebook Announcement:</strong></p>
+                    <p>🎉 BIG NEWS! We're excited to officially announce the launch of the new TNVS AI Helper! 🎉</p>
+                    <p>Draft emails, generate blog ideas, and create content in seconds, right from your dashboard. It's designed to boost your productivity and streamline your workflow.</p>
+                    <p>Check it out now and let us know what you think! 👉 [Link to Dashboard]</p>
+                    <p>#NewProduct #LaunchDay #AI #ProductivityTools #TNVS</p>`;
+        }
+        if (lowerPrompt.includes('ad copy')) {
+            return `<p><strong>Ad Copy for a New App:</strong></p>
+                    <p><strong>Headline:</strong> Stop Wasting Time. Start Automating.</p>
+                    <p><strong>Body:</strong> Introducing the new TNVS App, the all-in-one productivity tool that helps you reclaim your day. Draft emails, organize files, and generate content with a single click. Download now and transform your workflow!</p>
+                    <p><strong>Call to Action:</strong> Get Started for Free</p>`;
+        }
+        if (lowerPrompt.includes('explain') && (lowerPrompt.includes('simply') || lowerPrompt.includes('eli5'))) {
+            return `<p><strong>Explain "The Cloud" Like I'm 5:</strong></p>
+                    <p>Imagine you have a giant, magical toy box in the sky that you can reach from anywhere. Instead of keeping all your toys (like photos and documents) in your room where you might run out of space, you put them in this sky toy box.</p>
+                    <p>Whenever you want to play with a toy, you just ask the magic box, and it gives it to you, no matter where you are. That's what "the cloud" is—a giant, remote storage space for all your digital stuff!</p>`;
+        }
+        if (lowerPrompt.includes('short story')) {
+            return `<p><strong>Short Story Idea:</strong></p>
+                    <p>The old compass didn't point north. It pointed to whatever the holder's heart desired most. For Elara, it spun wildly, then settled on the jagged peaks of the Dragon's Tooth mountains. She had always yearned for adventure, but she never expected the compass to lead her to a hidden city, shimmering with technology far beyond her own time, nestled in the heart of the stone.</p>`;
+        }
+        if (lowerPrompt.includes('summarize')) {
+            return `<p><strong>Summary of a Long Text:</strong></p>
+                    <p>To get a summary, please paste the text you want to summarize here. The AI will then provide a condensed version highlighting the key points.</p>
+                    <p><em>(Note: This is a template. The actual summarization would require a real AI model.)</em></p>`;
+        }
+        if (lowerPrompt.includes('poll')) {
+            return `<p><strong>Social Media Poll Idea:</strong></p>
+                    <p><strong>Question:</strong> What's your favorite productivity hack?</p>
+                    <ul class="list-disc list-inside">
+                        <li>Time Blocking</li>
+                        <li>The Pomodoro Technique</li>
+                        <li>Eating the Frog</li>
+                        <li>Using an AI Assistant</li>
+                    </ul>`;
+        }
+        if (lowerPrompt.includes('product review')) {
+            return `<p><strong>Product Review Template:</strong></p>
+                    <p><strong>Title:</strong> A Game-Changer for Productivity!</p>
+                    <p>I've been using [Product Name] for a few weeks now, and it has completely transformed my workflow. The interface is incredibly intuitive, and the features are powerful yet easy to use. My favorite part is [mention a specific feature].</p>
+                    <p>I highly recommend it to anyone looking to [achieve a specific goal, e.g., save time, get more organized]. 5/5 stars!</p>`;
+        }
+        if (lowerPrompt.includes('brainstorm video ideas')) {
+            return `<p><strong>YouTube Video Ideas for a Tech Channel:</strong></p>
+                    <ul class="list-disc list-inside">
+                        <li>"My Desk Setup 2024 (Productivity Tour)"</li>
+                        <li>"5 AI Tools You're Not Using (But Should Be)"</li>
+                        <li>"I Automated My Entire Day With Scripts - Here's What Happened"</li>
+                        <li>"Building a Website From Scratch in 30 Minutes (Live Challenge)"</li>
+                    </ul>`;
+        }
+        if (lowerPrompt.includes('birthday wish')) {
+            return `<p><strong>Birthday Wish for a Friend:</strong></p>
+                    <p>Happy Birthday, [Friend's Name]! 🎉</p>
+                    <p>Wishing you a day filled with laughter, joy, and everything that makes you happy. Thanks for being such an amazing friend. Here's to another fantastic year of adventures and great memories!</p>
+                    <p>Cheers!</p>`;
+        }
         if (lowerPrompt.includes('professional email')) {
             return `<p><strong>Subject: Regarding [Subject of Email]</strong></p>
                     <p>Dear [Recipient Name],</p>
@@ -741,6 +826,42 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
                     <p>I have attached my resume for your review and look forward to the possibility of discussing this exciting opportunity with you further.</p>
                     <p>Sincerely,<br>[Your Name]</p>`;
         }
+        if (lowerPrompt.includes('blog post intro')) {
+            return `<p><strong>Title: Unlocking the Power of AI in Your Daily Workflow</strong></p>
+                    <p>In a world where efficiency is key, Artificial Intelligence (AI) is no longer a futuristic concept but a practical tool that can revolutionize how we work. From automating mundane tasks to providing deep insights from data, AI is reshaping industries. In this post, we'll explore how you can integrate simple AI helpers into your daily workflow to save time, reduce errors, and focus on what truly matters. Let's dive in!</p>`;
+        }
+        if (lowerPrompt.includes('product description')) {
+            return `<p><strong>Product: The TNVS AI Assistant</strong></p>
+                    <p>Meet your new productivity partner: the TNVS AI Assistant. Seamlessly integrated into your dashboard, this powerful tool helps you draft emails, generate content ideas, and streamline your creative process. With its intuitive interface, you can get instant help without ever leaving your workspace. Boost your efficiency and unlock your creative potential with the TNVS AI Assistant today!</p>`;
+        }
+
+        if (lowerPrompt.includes('event invitation')) {
+            return `<p><strong>Subject: You're Invited! [Event Name]</strong></p>
+                    <p>Dear [Guest Name],</p>
+                    <p>We're excited to invite you to [Event Name], where we will be [briefly describe the event's purpose, e.g., celebrating a milestone, launching a new product].</p>
+                    <p><strong>Date:</strong> [Date]<br><strong>Time:</strong> [Time]<br><strong>Location:</strong> [Venue/Address or Virtual Link]</p>
+                    <p>We would be delighted to have you join us for this special occasion. Please RSVP by [RSVP Date] so we can get a headcount.</p>
+                    <p>Best regards,<br>The TNVS Team</p>`;
+        }
+        if (lowerPrompt.includes('customer service reply')) {
+            return `<p><strong>Subject: Re: Regarding your recent inquiry</strong></p>
+                    <p>Dear [Customer Name],</p>
+                    <p>Thank you for reaching out to us. We are very sorry to hear about the issue you experienced with [mention the issue]. That is certainly not the standard of service we aim to provide.</p>
+                    <p>We are looking into this immediately. To help us resolve this for you, could you please provide [ask for any necessary information, e.g., your order number]?</p>
+                    <p>We appreciate your patience and understanding.</p>
+                    <p>Sincerely,<br>[Your Name]<br>Customer Support</p>`;
+        }
+        if (lowerPrompt.includes('business proposal outline')) {
+            return `<h4>Business Proposal: [Project Title]</h4>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li><strong>Executive Summary:</strong> A brief overview of the proposal.</li>
+                        <li><strong>Problem Statement:</strong> Clearly define the problem your project will solve.</li>
+                        <li><strong>Proposed Solution:</strong> Detail your solution and how it addresses the problem.</li>
+                        <li><strong>Timeline & Deliverables:</strong> Outline the project schedule and key milestones.</li>
+                        <li><strong>Budget:</strong> Provide a breakdown of the costs involved.</li>
+                    </ol>`;
+        }
+
         if (lowerPrompt.includes('slogan ideas')) {
             return `<p><strong>Marketing Slogans for a New Tech Product:</strong></p>
                     <ul class="list-disc list-inside">
@@ -750,30 +871,25 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
                         <li>"Powering Your Potential."</li>
                     </ul>`;
         }
-        if (lowerPrompt.includes('blog post intro')) {
-            return `<p><strong>Title: Unlocking the Power of AI in Your Daily Workflow</strong></p>
-                    <p>In a world where efficiency is key, Artificial Intelligence (AI) is no longer a futuristic concept but a practical tool that can revolutionize how we work. From automating mundane tasks to providing deep insights from data, AI is reshaping industries. In this post, we'll explore how you can integrate simple AI helpers into your daily workflow to save time, reduce errors, and focus on what truly matters. Let's dive in!</p>`;
-        }
         if (lowerPrompt.includes('youtube script idea')) {
             return `<p><strong>Title: My Top 5 Favorite Automation Scripts!</strong></p>
                     <p><strong>(Intro)</strong> Hey everyone, and welcome back to the channel! Today, I'm going to share something that has saved me countless hours: my top 5 favorite automation scripts. Whether you're a developer, a student, or just someone who wants to be more efficient, these scripts are game-changers.</p>
                     <p><strong>(Script 1: File Organizer)</strong> First up, we have the file organizer...</p>`;
         }
-        if (lowerPrompt.includes('product description')) {
-            return `<p><strong>Product: The TNVS AI Assistant</strong></p>
-                    <p>Meet your new productivity partner: the TNVS AI Assistant. Seamlessly integrated into your dashboard, this powerful tool helps you draft emails, generate content ideas, and streamline your creative process. With its intuitive interface, you can get instant help without ever leaving your workspace. Boost your efficiency and unlock your creative potential with the TNVS AI Assistant today!</p>`;
+        if (lowerPrompt.includes('linkedin summary')) {
+            return `<p><strong>LinkedIn Profile Summary:</strong></p>
+                    <p>Results-driven [Your Profession, e.g., Software Engineer] with over [X] years of experience in [Your Industry]. Passionate about [mention a passion, e.g., building scalable web applications and creating intuitive user experiences]. Proven ability to lead projects and collaborate effectively with cross-functional teams to deliver high-quality products.</p>`;
         }
-        if (lowerPrompt.includes('apology email')) {
-            return `<p><strong>Subject: Apology Regarding [Issue]</strong></p>
-                    <p>Dear [Recipient Name],</p>
-                    <p>Please accept our sincerest apologies for the recent issue regarding [briefly describe the issue]. We understand the frustration this has caused, and we are taking immediate steps to resolve it. We value your business and are committed to providing a better experience.</p>
-                    <p>Sincerely,<br>The TNVS Team</p>`;
-        }
-        if (lowerPrompt.includes('meeting agenda')) {
-            return `<p><strong>Meeting Agenda: [Meeting Title]</strong></p>
-                    <p><strong>Date:</strong> [Date]</p>
-                    <p><strong>Attendees:</strong> [List of Attendees]</p>
-                    <ol class="list-decimal list-inside"><li><strong>Review of Previous Action Items</strong> (5 mins)</li><li><strong>Project Milestone Updates</strong> (15 mins)</li><li><strong>Discussion on [Main Topic]</strong> (25 mins)</li><li><strong>Next Steps & Action Items</strong> (10 mins)</li><li><strong>Q&A</strong> (5 mins)</li></ol>`;
+        if (lowerPrompt.includes('job description')) {
+            return `<p><strong>Job Title: [e.g., Frontend Developer]</strong></p>
+                    <p><strong>Location:</strong> [e.g., Remote]</p>
+                    <p><strong>About the Role:</strong> We are looking for a passionate [Job Title] to join our dynamic team. You will be responsible for [mention key responsibilities, e.g., developing and maintaining web applications].</p>
+                    <p><strong>Requirements:</strong></p>
+                    <ul class="list-disc list-inside">
+                        <li>Proven experience as a [Job Title].</li>
+                        <li>Proficiency in [mention skills, e.g., React, HTML, CSS].</li>
+                        <li>Excellent problem-solving skills.</li>
+                    </ul>`;
         }
         if (lowerPrompt.includes('press release')) {
             return `<p><strong>FOR IMMEDIATE RELEASE</strong></p>
@@ -782,8 +898,129 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
                     <p>The product is available starting [Date] at [Website/Store].</p>
                     <p>###</p>`;
         }
+        if (lowerPrompt.includes('meeting agenda')) {
+            return `<p><strong>Meeting Agenda: [Meeting Title]</strong></p>
+                    <p><strong>Date:</strong> [Date]</p>
+                    <p><strong>Attendees:</strong> [List of Attendees]</p>
+                    <ol class="list-decimal list-inside">
+                        <li><strong>Review of Previous Action Items</strong> (5 mins)</li>
+                        <li><strong>Project Milestone Updates</strong> (15 mins)</li>
+                        <li><strong>Discussion on [Main Topic]</strong> (25 mins)</li>
+                        <li><strong>Next Steps & Action Items</strong> (10 mins)</li>
+                        <li><strong>Q&A</strong> (5 mins)</li>
+                    </ol>`;
+        }
 
-        return "I'm sorry, I can't generate content for that prompt yet. Try asking for a 'professional email', 'cover letter', 'slogan ideas', or 'press release'.";
+        if (lowerPrompt.includes('follow-up email')) {
+            return `<p><strong>Subject: Following Up on Our Conversation</strong></p>
+                    <p>Dear [Recipient Name],</p>
+                    <p>It was a pleasure speaking with you earlier today about [topic of conversation]. I wanted to quickly follow up and reiterate my interest.</p>
+                    <p>I am very excited about the opportunity and look forward to hearing from you soon.</p>
+                    <p>Best regards,<br>[Your Name]</p>`;
+        }
+
+        if (lowerPrompt.includes('apology email')) {
+            return `<p><strong>Subject: Apology Regarding [Issue]</strong></p>
+                    <p>Dear [Recipient Name],</p>
+                    <p>Please accept our sincerest apologies for the recent issue regarding [briefly describe the issue]. We understand the frustration this has caused, and we are taking immediate steps to resolve it. We value your business and are committed to providing a better experience.</p>
+                    <p>Sincerely,<br>The TNVS Team</p>`;
+        }
+
+        if (lowerPrompt.includes('email') && lowerPrompt.includes('hod')) {
+            return `<p><strong>Subject: Regarding [Your Subject, e.g., Project Proposal, Leave Request]</strong></p>
+                    <p>Dear [HOD's Name],</p>
+                    <p>I hope this email finds you well.</p>
+                    <p>I am writing to you today to discuss [briefly state the purpose of your email]. I would like to [provide more details or ask for a meeting].</p>
+                    <p>I have attached [mention any attachments, e.g., a document with more details] for your reference.</p>
+                    <p>Thank you for your time and consideration. I look forward to your guidance on this matter.</p>
+                    <p>Best regards,<br>[Your Name]<br>[Your Designation/Roll Number]</p>`;
+        }
+
+        // General email prompt - should be checked after more specific ones
+        if (lowerPrompt.includes('write an email') || lowerPrompt === 'email') {
+            return `<p><strong>Subject: [A Clear and Concise Subject]</strong></p>
+                    <p>Dear [Recipient's Name],</p>
+                    <p>I hope this message finds you well.</p>
+                    <p>[State the main purpose of your email here. Be clear and to the point.]</p>
+                    <p>[Provide any necessary details, context, or background information here.]</p>
+                    <p>Thank you for your time.</p>
+                    <p>Sincerely,<br>[Your Name]</p>`;
+        }
+
+        return "I'm sorry, I can't generate content for that prompt yet. Try asking for 'ad copy', 'write a product review', 'create a poll', or 'professional email'.";
+    }
+
+    generateAiContentBtn.addEventListener('click', () => {
+        const prompt = aiPromptInput.value.trim();
+        if (!prompt) {
+            alert("Please enter a prompt for the AI.");
+            return;
+        }
+
+        aiContentOutput.classList.remove('hidden');
+        aiContentContainer.innerHTML = '<p>Generating...</p>';
+        generateAiContentBtn.disabled = true;
+        
+        // Simulate an API call to feel more responsive
+        setTimeout(() => {
+            const response = getAiContentResponse(prompt);
+            aiContentContainer.innerHTML = response; // Use innerHTML to render line breaks
+            generateAiContentBtn.disabled = false;
+        }, 1000);
+    });
+
+    aiPromptInput.addEventListener('keydown', (e) => {
+        // Trigger generate on Enter key, but allow Shift+Enter for new lines
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            generateAiContentBtn.click();
+        }
+    });
+
+    function createPromptSuggestions() {
+        aiPromptSuggestionsContainer = document.createElement('div');
+        aiPromptSuggestionsContainer.id = 'aiPromptSuggestions';
+        aiPromptSuggestionsContainer.className = 'absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg mt-1 hidden max-h-60 overflow-y-auto';
+        // Ensure parent is positioned to contain the absolute suggestions box
+        if (aiPromptInput.parentElement.style.position !== 'relative') {
+            aiPromptInput.parentElement.style.position = 'relative';
+        }
+        aiPromptInput.parentElement.appendChild(aiPromptSuggestionsContainer);
+
+        aiPromptInput.addEventListener('input', () => {
+            const query = aiPromptInput.value.toLowerCase();
+            if (!query) {
+                aiPromptSuggestionsContainer.classList.add('hidden');
+                return;
+            }
+
+            const filtered = aiPromptSuggestions.filter(p => p.toLowerCase().includes(query));
+            aiPromptSuggestionsContainer.innerHTML = '';
+
+            if (filtered.length > 0) {
+                filtered.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.textContent = suggestion;
+                    item.className = 'p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+                    item.addEventListener('click', () => {
+                        aiPromptInput.value = suggestion;
+                        aiPromptSuggestionsContainer.classList.add('hidden');
+                        aiPromptInput.focus();
+                    });
+                    aiPromptSuggestionsContainer.appendChild(item);
+                });
+                aiPromptSuggestionsContainer.classList.remove('hidden');
+            } else {
+                aiPromptSuggestionsContainer.classList.add('hidden');
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target !== aiPromptInput) {
+                aiPromptSuggestionsContainer.classList.add('hidden');
+            }
+        });
     }
 
     logoutBtn.addEventListener('click', () => {
@@ -928,10 +1165,19 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             return "The 'User Greeter Script' is a fun VBScript file you can download from the 'Windows Automation' page. When you run it, it shows a personalized welcome message with your name!";
         }
         if (lowerInput.includes('what can i ask the ai helper')) {
-            return "You can ask the AI Helper to do many things! Try prompts like: 'write a professional email', 'create a blog post intro', 'give me YouTube script ideas', or 'draft a product description'. Just type your request in the 'AI Helper' section!";
+            return "You can ask the AI Helper to do many things! Try prompts like: 'write a professional email', 'create a blog post intro', 'give me YouTube script ideas', 'draft a product description', or 'write a job description'. Just type your request in the 'AI Helper' section!";
         }
         if (lowerInput.includes('help') || lowerInput.includes('what can you do')) {
             return "I can help with questions about your profile, automation tasks, or navigating the dashboard. For example, try asking 'How do I change my photo?', 'Tell me about the data entry bot', or 'How do I play games?'.";
+        }
+        if (lowerInput.includes('system info') || lowerInput.includes('widgets')) {
+            return "The widgets on the dashboard show you real-time information about your system, including your OS, browser, IP address, and network speed. They are there to give you a quick snapshot of your current environment.";
+        }
+        if (lowerInput.includes('report an issue') || lowerInput.includes('report bug')) {
+            return "You can report an issue with any feature by clicking the 'Report Issue' button located on that feature's card. This will open a form where you can describe the problem you're facing.";
+        }
+        if (lowerInput.includes('who made you') || lowerInput.includes('who created you')) {
+            return "I was created by the team at TNVS Official to be your helpful guide for this TNVS Official Site. My purpose is to make your experience here as smooth as possible!";
         }
         if (lowerInput.includes('task') || lowerInput.includes('to-do')) {
             return "You can manage your to-do list in the 'My Tasks' section on the main dashboard. Just type in the input field to add a new task, and use the buttons to mark it as complete or delete it.";
@@ -955,7 +1201,7 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             return 'TNVS Official is a technology company focused on delivering innovative solutions. This dashboard is your personal hub to manage your profile and access exclusive automation tools and games.';
         }
         if (lowerInput.includes('who are you')) {
-            return "I am the TNVS AI Assistant, your personal guide for this dashboard. How can I help you today?";
+            return "I am the TNVS AI Assistant, your personal guide for this TNVS Official Site. How can I help you today?";
         }
         if (lowerInput.includes('get started')) {
             return 'You are in the right place! This dashboard is the best place to start. Explore the sections on the left to see what you can do, or ask me a question like "What is the AI Helper?".';
@@ -1192,6 +1438,7 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             initializeDashboardWidgets();
             initializeFeatureEventListeners();
             initializeSettings();
+            createPromptSuggestions(); // Initialize the prompt suggestions feature
         } else {
             window.location.href = 'auth.html';
         }
