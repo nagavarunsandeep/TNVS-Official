@@ -693,7 +693,7 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer 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",
+                    "Authorization": "Bearer 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",
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://tnvs-site.web.app", // Example URL
                     "X-Title": "TNVS Official Site" // Example Title
@@ -1200,3 +1200,4 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
     });
 });
+
