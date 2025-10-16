@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = getAuth(app);
     // IMPORTANT: Replace with your actual OpenRouter API key.
     // It's recommended to use a proxy or serverless function to hide this key in a production environment.
-    const OPENROUTER_API_KEY = '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'; 
     const storage = getStorage(app);
     const db = getFirestore(app);
 
@@ -694,7 +693,7 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                    "Authorization": "Bearer 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",
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://tnvs-site.web.app", // Example URL
                     "X-Title": "TNVS Official Site" // Example Title
