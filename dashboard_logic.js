@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // AI Content Helper elements
     const generateAiContentBtn = document.getElementById('generateAiContentBtn');
     const aiPromptInput = document.getElementById('aiPromptInput');
+    const aiHelperForm = document.getElementById('aiHelperForm');
     const aiContentOutput = document.getElementById('aiContentOutput');
-    const aiContentContainer = aiContentOutput.querySelector('div');
     let aiPromptSuggestionsContainer; // Will be created dynamically
 
     // Chatbot elements
@@ -677,18 +677,45 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
     // Initial render of tasks
     renderTasks();
 
+    function addAiChatMessage(text, sender, isGenerating = false) {
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'flex', 'flex-col');
+        messageContainer.classList.toggle('items-end', sender === 'user');
+        messageContainer.classList.toggle('items-start', sender === 'bot');
 
-    generateAiContentBtn.addEventListener('click', async () => {
+        const messageBubble = document.createElement('div');
+        messageBubble.classList.add('p-3', 'rounded-lg', 'max-w-xl');
+        messageBubble.classList.toggle('bg-indigo-500', sender === 'user');
+        messageBubble.classList.toggle('text-white', sender === 'user');
+        messageBubble.classList.toggle('bg-gray-200', sender === 'bot');
+        messageBubble.classList.toggle('dark:bg-gray-700', sender === 'bot');
+
+        const senderLabel = document.createElement('p');
+        senderLabel.classList.add('text-xs', 'font-bold', 'mb-1', 'px-1');
+        senderLabel.textContent = sender === 'user' ? 'You' : 'AI';
+        senderLabel.classList.toggle('text-gray-600', sender === 'user');
+        senderLabel.classList.toggle('dark:text-gray-400', sender === 'user');
+        senderLabel.classList.toggle('text-purple-600', sender === 'bot');
+        senderLabel.classList.toggle('dark:text-purple-400', sender === 'bot');
+
+        messageBubble.innerHTML = isGenerating ? '<p class="text-gray-500">Generating...</p>' : `<p>${text}</p>`;
+        messageContainer.appendChild(senderLabel);
+        messageContainer.appendChild(messageBubble);
+        aiContentOutput.appendChild(messageContainer);
+        messageContainer.scrollIntoView({ behavior: "smooth", block: "end" });
+        return messageBubble;
+    }
+
+    aiHelperForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const prompt = aiPromptInput.value.trim();
         if (!prompt) {
-            alert("Please enter a prompt for the AI.");
             return;
         }
-
-        aiContentOutput.classList.remove('hidden');
-        aiContentContainer.innerHTML = '<p class="text-gray-500">Generating...</p>';
-        generateAiContentBtn.disabled = true;
-        
+        addAiChatMessage(prompt, 'user');
+        aiPromptInput.value = '';
+        const botMessageBubble = addAiChatMessage('', 'bot', true);
+        toggleButtonLoading(generateAiContentBtn, true);
         try {
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
@@ -699,7 +726,7 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
                     "X-Title": "TNVS Official Site" // Example Title
                 },
                 body: JSON.stringify({
-                    "model": "openai/gpt-oss-20b:free", // Using a standard, reliable model
+                    "model": "openai/gpt-oss-20b:free", // Switched to another reliable free model
                     "messages": [
                         { "role": "user", "content": prompt }
                     ]
@@ -715,21 +742,13 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             const aiResponse = data.choices[0].message.content;
             // Sanitize and format the response slightly for better display
             const formattedResponse = aiResponse.replace(/\n/g, '<br>');
-            aiContentContainer.innerHTML = formattedResponse;
+            botMessageBubble.innerHTML = `<p>${formattedResponse}</p>`;
 
         } catch (error) {
             console.error("AI Helper Error:", error);
-            aiContentContainer.innerHTML = `<p class="text-red-500">Sorry, something went wrong. Please check the console for details or try again later. Make sure your API key is set correctly.</p>`;
+            botMessageBubble.innerHTML = `<p class="text-red-500">Sorry, something went wrong. Please try again later.</p>`;
         } finally {
-            generateAiContentBtn.disabled = false;
-        }
-    });
-
-    aiPromptInput.addEventListener('keydown', (e) => {
-        // Trigger generate on Enter key, but allow Shift+Enter for new lines
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            generateAiContentBtn.click();
+            toggleButtonLoading(generateAiContentBtn, false);
         }
     });
 
@@ -1200,4 +1219,3 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
     });
 });
-
