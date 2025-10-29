@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickAiHelper = document.getElementById('quickAiHelper');
     const quickAutomation = document.getElementById('quickAutomation');
     const quickGameZone = document.getElementById('quickGameZone');
-    const locationInfo = document.getElementById('locationInfo');
 
     // To-Do List elements
     const taskForm = document.getElementById('taskForm');
@@ -471,34 +470,6 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
     }
 
-
-    function updateLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const { latitude, longitude } = position.coords;
-                try {
-                    // Use a free reverse geocoding API (Nominatim)
-                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-                    const data = await response.json();
-                    if (data && data.address) {
-                        const city = data.address.city || data.address.town || data.address.village || 'Unknown City';
-                        const country = data.address.country || 'Unknown Country';
-                        locationInfo.textContent = `${city}, ${country}`;
-                    } else {
-                        locationInfo.textContent = "Location not found";
-                    }
-                } catch (error) {
-                    console.error("Error fetching location name:", error);
-                    locationInfo.textContent = "Could not fetch name";
-                }
-            }, () => {
-                locationInfo.textContent = "Permission denied";
-            });
-        } else {
-            locationInfo.textContent = "Not supported";
-        }
-    }
-
     // --- System Information Logic ---
     function updateSystemInfo() {
         // OS Info
@@ -598,12 +569,58 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         headerProfilePic.src = photoURL;
     }
 
+    function initializeGoogleSearch() {
+        const searchForm = document.getElementById('googleSearchForm');
+        const searchInput = document.getElementById('googleSearchInput');
+        const suggestionsContainer = document.getElementById('googleSearchSuggestions');
+
+        searchInput.addEventListener('input', async () => {
+            const query = searchInput.value;
+            if (query.length < 2) {
+                suggestionsContainer.classList.add('hidden');
+                return;
+            }
+
+            try {
+                // Using a CORS proxy to bypass browser restrictions on the Google Suggest API
+                const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(`http://suggestqueries.google.com/complete/search?client=firefox&q=${query}`)}`);
+                const data = await response.json();
+                const suggestions = data[1];
+
+                suggestionsContainer.innerHTML = '';
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const item = document.createElement('div');
+                        item.textContent = suggestion;
+                        item.className = 'p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600';
+                        item.addEventListener('click', () => {
+                            searchInput.value = suggestion;
+                            searchForm.submit();
+                        });
+                        suggestionsContainer.appendChild(item);
+                    });
+                    suggestionsContainer.classList.remove('hidden');
+                } else {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching search suggestions:', error);
+                suggestionsContainer.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchForm.contains(e.target)) {
+                suggestionsContainer.classList.add('hidden');
+            }
+        });
+    }
+
     function initializeDashboardWidgets() {
         updateSystemInfo();
-        updateLocation();
         updateIpAddress(); // Fetch the IP address on load
         updateNetworkInfo(); // Initial call
-        setInterval(updateNetworkInfo, 3000); // Update every 3 seconds for a real-time feel
+        setInterval(updateNetworkInfo, 5000); // Update every 5 seconds for a real-time feel
     }
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -858,16 +875,25 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
     chatbotForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const userInput = chatbotInput.value.trim();
-        if (!userInput) return;
+        if (!userInput) {
+            return;
+        }
 
-        addMessage(userInput, 'user');
-        chatbotInput.value = '';
+        // Clear chat history if user types 'clear'
+        if (userInput.toLowerCase() === 'clear') {
+            chatbotMessages.innerHTML = '';
+            addMessage("Chat history has been cleared.", 'bot');
+            chatbotInput.value = '';
+        } else {
+            addMessage(userInput, 'user');
+            chatbotInput.value = '';
 
-        // Simulate bot response
-        setTimeout(() => {
-            const botResponse = getBotResponse(userInput);
-            addMessage(botResponse, 'bot');
-        }, 1000);
+            // Simulate bot response
+            setTimeout(() => {
+                const botResponse = getBotResponse(userInput);
+                addMessage(botResponse, 'bot');
+            }, 1000);
+        }
     });
 
     // Function to add a message to the chat window
