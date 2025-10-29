@@ -131,18 +131,19 @@
                                 <p class="text-gray-600 dark:text-gray-400">SSID: <span class="font-semibold text-gray-700 dark:text-gray-200">Protected</span></p>
                             </div>
                         </div>
-                        <!-- Current Location Card -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center">
-                            <div class="bg-teal-100 dark:bg-teal-900 p-4 rounded-full mr-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-600 dark:text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100">Current Location</h4>
-                                <p id="locationInfo" class="text-xl font-bold text-gray-700 dark:text-gray-200 mt-1">Detecting...</p>
-                            </div>
+                        <!-- Weather Widget Card -->
+                        <!-- Google Search Card -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col justify-center">
+                            <h4 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 text-center flex items-center justify-center"><img src="https://www.google.com/favicon.ico" alt="Google icon" class="h-5 w-5 mr-2"> Quick Search</h4>
+                            <form id="googleSearchForm" action="https://www.google.com/search" method="get" target="_blank" class="relative flex items-center space-x-2">
+                                <input id="googleSearchInput" type="text" name="q" placeholder="Search with Google..." autocomplete="off" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow duration-300 shadow-sm focus:shadow-md">
+                                <div id="googleSearchSuggestions" class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg z-10 hidden max-h-60 overflow-y-auto"></div>
+                                <button type="submit" class="bg-blue-600 text-white p-2.5 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                             <div class="flex items-center mb-2">
