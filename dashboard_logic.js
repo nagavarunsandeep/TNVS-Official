@@ -1,7 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, updateProfile, updateEmail, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, updateProfile, updateEmail, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const firebaseConfig = {
@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiHelperContent = document.getElementById('aiHelperContent');
     const gameContent = document.getElementById('gameContent');
     const settingsContent = document.getElementById('settingsContent');
+    const sudokuContent = document.getElementById('sudokuContent');
+    const qrContent = document.getElementById('qrContent');
     
     // Sidebar links
     const sidebarNav = document.getElementById('sidebarNav');
@@ -46,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiHelperLink = document.getElementById('aiHelperLink');
     const gameLink = document.getElementById('gameLink');
     const settingsLink = document.getElementById('settingsLink');
+    const sudokuLink = document.getElementById('sudokuLink');
+    const qrLink = document.getElementById('qrLink');
 
     // Profile detail elements
     const profilePicture = document.getElementById('profilePicture');
@@ -134,7 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showSection(sectionToShow, activeLink) {
         // Hide all sections
-        [dashboardContent, profileContent, automationContent, aiHelperContent, gameContent, settingsContent].forEach(sec => sec.classList.add('hidden'));
+        [dashboardContent, profileContent, automationContent, aiHelperContent, gameContent, settingsContent, sudokuContent, qrContent].forEach(sec => {
+            if (sec) sec.classList.add('hidden');
+        });
         // Deactivate all links
         sidebarNav.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
     
@@ -179,6 +185,21 @@ document.addEventListener('DOMContentLoaded', () => {
         headerTitle.textContent = 'Settings';
     });
 
+    if (sudokuLink) {
+        sudokuLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(sudokuContent, sudokuLink);
+            headerTitle.textContent = 'Sudoku Solver';
+        });
+    }
+
+    if (qrLink) {
+        qrLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(qrContent, qrLink);
+            headerTitle.textContent = 'QR & Barcode Tool';
+        });
+    }
     quickEditProfile.addEventListener('click', () => {
         // Simulate clicking the profile link in the sidebar
         profileLink.click();
