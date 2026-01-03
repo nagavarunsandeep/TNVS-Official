@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsContent = document.getElementById('settingsContent');
     const sudokuContent = document.getElementById('sudokuContent');
     const qrContent = document.getElementById('qrContent');
+    const martContent = document.getElementById('martContent');
     
     // Sidebar links
     const sidebarNav = document.getElementById('sidebarNav');
@@ -50,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsLink = document.getElementById('settingsLink');
     const sudokuLink = document.getElementById('sudokuLink');
     const qrLink = document.getElementById('qrLink');
+    const martLink = document.getElementById('martLink');
 
     // Profile detail elements
     const profilePicture = document.getElementById('profilePicture');
@@ -76,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickAiHelper = document.getElementById('quickAiHelper');
     const quickAutomation = document.getElementById('quickAutomation');
     const quickGameZone = document.getElementById('quickGameZone');
+    const quickSudoku = document.getElementById('quickSudoku');
+    const quickQr = document.getElementById('quickQr');
+    const quickSettings = document.getElementById('quickSettings');
 
     // To-Do List elements
     const taskForm = document.getElementById('taskForm');
@@ -102,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const memoryInfo = document.getElementById('memoryInfo');
     const processorInfo = document.getElementById('processorInfo');
     const browserInfo = document.getElementById('browserInfo');
+    const batteryInfo = document.getElementById('batteryInfo');
 
     // Report Issue Modal elements
     const reportIssueModal = document.getElementById('reportIssueModal');
@@ -138,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showSection(sectionToShow, activeLink) {
         // Hide all sections
-        [dashboardContent, profileContent, automationContent, aiHelperContent, gameContent, settingsContent, sudokuContent, qrContent].forEach(sec => {
+        [dashboardContent, profileContent, automationContent, aiHelperContent, gameContent, settingsContent, sudokuContent, qrContent, martContent].forEach(sec => {
             if (sec) sec.classList.add('hidden');
         });
         // Deactivate all links
@@ -200,6 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
             headerTitle.textContent = 'QR & Barcode Tool';
         });
     }
+
+    if (martLink) {
+        martLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(martContent, martLink);
+            headerTitle.textContent = 'TNVS Mart';
+        });
+    }
     quickEditProfile.addEventListener('click', () => {
         // Simulate clicking the profile link in the sidebar
         profileLink.click();
@@ -216,6 +230,58 @@ document.addEventListener('DOMContentLoaded', () => {
     quickGameZone.addEventListener('click', () => {
         gameLink.click();
     });
+
+    if (quickSudoku) {
+        quickSudoku.addEventListener('click', () => {
+            if (sudokuLink) sudokuLink.click();
+        });
+    }
+
+    if (quickQr) {
+        quickQr.addEventListener('click', () => {
+            if (qrLink) qrLink.click();
+        });
+    }
+
+    if (quickSettings) {
+        quickSettings.addEventListener('click', () => {
+            settingsLink.click();
+        });
+    }
+
+    // Copy IP Button Logic
+    const copyIpBtn = document.getElementById('copyIpBtn');
+    if (copyIpBtn) {
+        copyIpBtn.addEventListener('click', () => {
+            const ipText = document.getElementById('ipAddress').textContent;
+            if (ipText && ipText !== 'Detecting...' && ipText !== 'Unavailable') {
+                navigator.clipboard.writeText(ipText).then(() => {
+                    showToast('IP Address copied to clipboard!');
+                }).catch(err => console.error('Failed to copy IP:', err));
+            }
+        });
+    }
+
+    // Speed Test Button Logic
+    const runSpeedTestBtn = document.getElementById('runSpeedTestBtn');
+    if (runSpeedTestBtn) {
+        runSpeedTestBtn.addEventListener('click', async () => {
+            const originalContent = runSpeedTestBtn.innerHTML;
+            runSpeedTestBtn.innerHTML = '<svg class="animate-spin h-3 w-3 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Testing...';
+            runSpeedTestBtn.disabled = true;
+            
+            await updateNetworkInfo();
+            
+            runSpeedTestBtn.innerHTML = originalContent;
+            if (navigator.onLine) {
+                runSpeedTestBtn.disabled = false;
+                runSpeedTestBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                runSpeedTestBtn.disabled = true;
+                runSpeedTestBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+    }
 
     // --- WScript Integration Logic ---
     const runGreeterScriptBtn = document.getElementById('runGreeterScriptBtn');
@@ -446,13 +512,53 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
     async function updateNetworkInfo() {
         const connectionTypeEl = document.getElementById('connectionType');
         const connectionSpeedEl = document.getElementById('connectionSpeed');
+        const networkLatencyEl = document.getElementById('networkLatency');
+        const dataUsageEl = document.getElementById('dataUsage');
+        const connectionDownlinkEl = document.getElementById('connectionDownlink');
+        const connectionRttEl = document.getElementById('connectionRtt');
+        const statusDot = document.getElementById('statusDot');
+        const statusPing = document.getElementById('statusPing');
+        const runSpeedTestBtn = document.getElementById('runSpeedTestBtn');
+
+        // Status Dot Logic
+        const isOnline = navigator.onLine;
+
+        // Speed Test Button Offline Logic
+        if (runSpeedTestBtn) {
+            const isTesting = runSpeedTestBtn.innerHTML.includes('Testing...');
+            if (!isTesting) {
+                if (isOnline) {
+                    runSpeedTestBtn.disabled = false;
+                    runSpeedTestBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    runSpeedTestBtn.title = "Run Speed Test";
+                } else {
+                    runSpeedTestBtn.disabled = true;
+                    runSpeedTestBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    runSpeedTestBtn.title = "You are offline";
+                }
+            }
+        }
+
+        if (statusDot && statusPing) {
+             if (isOnline) {
+                statusDot.classList.replace('bg-red-500', 'bg-green-500');
+                statusPing.classList.replace('bg-red-400', 'bg-green-400');
+             } else {
+                statusDot.classList.replace('bg-green-500', 'bg-red-500');
+                statusPing.classList.replace('bg-green-400', 'bg-red-400');
+             }
+        }
     
         // Update connection type (this is static and fine)
         if (navigator.connection) {
             const connection = navigator.connection;
-            connectionTypeEl.textContent = connection.effectiveType.toUpperCase();
+            connectionTypeEl.textContent = connection.effectiveType ? connection.effectiveType.toUpperCase() : 'Unknown';
+            if (connectionDownlinkEl) connectionDownlinkEl.textContent = connection.downlink ? `~${connection.downlink} Mbps` : 'N/A';
+            if (connectionRttEl) connectionRttEl.textContent = connection.rtt ? `~${connection.rtt} ms` : 'N/A';
         } else {
             connectionTypeEl.textContent = 'Unknown';
+            if (connectionDownlinkEl) connectionDownlinkEl.textContent = 'N/A';
+            if (connectionRttEl) connectionRttEl.textContent = 'N/A';
         }
     
         // --- Real-time speed test ---
@@ -477,17 +583,41 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             console.error("Speed test error:", error);
             connectionSpeedEl.textContent = "N/A";
         }
+
+        // --- Latency Test ---
+        try {
+            const startPing = performance.now();
+            await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' });
+            const endPing = performance.now();
+            if (networkLatencyEl) networkLatencyEl.textContent = `${Math.round(endPing - startPing)} ms`;
+        } catch (e) {
+            if (networkLatencyEl) networkLatencyEl.textContent = "-- ms";
+        }
+
+        // --- Data Usage (Session) ---
+        if (dataUsageEl && performance.getEntriesByType) {
+            const totalBytes = performance.getEntriesByType("resource").reduce((acc, entry) => acc + (entry.transferSize || 0), 0);
+            dataUsageEl.textContent = `${(totalBytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
     }
 
     async function updateIpAddress() {
         const ipAddressEl = document.getElementById('ipAddress');
         try {
+            // Force IPv4 by using a service that only resolves to IPv4
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
             ipAddressEl.textContent = data.ip;
         } catch (error) {
-            console.error("Could not fetch IP address:", error);
-            ipAddressEl.textContent = "Unavailable";
+            try {
+                // Fallback to another IPv4 service
+                const response = await fetch('https://ipv4.icanhazip.com/');
+                const text = await response.text();
+                ipAddressEl.textContent = text.trim();
+            } catch (e) {
+                console.error("Could not fetch IP address:", e);
+                ipAddressEl.textContent = "Unavailable";
+            }
         }
     }
 
@@ -524,27 +654,30 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             osInfo.textContent = os;
         }
 
-        // Memory Info (Note: this is a non-standard API)
+        // Memory Info
         if (navigator.deviceMemory) {
-            memoryInfo.textContent = `${navigator.deviceMemory} GB RAM`;
+            // deviceMemory is approximate and capped at 8GB for privacy
+            const mem = navigator.deviceMemory;
+            // Clarify that this is an approximation provided by the browser
+            memoryInfo.textContent = mem >= 8 ? `≥ ${mem} GB` : `~${mem} GB`;
+        } else {
+            memoryInfo.textContent = "N/A";
         }
 
         // Processor Info
-        const cores = navigator.hardwareConcurrency ? ` (${navigator.hardwareConcurrency} cores)` : '';
+        const cores = navigator.hardwareConcurrency || 'Unknown';
         if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-            navigator.userAgentData.getHighEntropyValues(['architecture'])
+            navigator.userAgentData.getHighEntropyValues(['architecture', 'bitness'])
             .then(ua => {
-                if (ua.architecture) {
-                    processorInfo.textContent = `${ua.architecture}${cores}`;
-                } else {
-                    processorInfo.textContent = `Unknown${cores}`;
-                }
+                const arch = ua.architecture || 'Unknown Arch';
+                const bitness = ua.bitness ? ` ${ua.bitness}-bit` : '';
+                processorInfo.textContent = `${arch}${bitness} (${cores} Logical Cores)`;
             }).catch(() => {
-                processorInfo.textContent = `Not available${cores}`;
+                processorInfo.textContent = `${cores} Logical Cores`;
             });
         } else {
             // Fallback for browsers without userAgentData
-            processorInfo.textContent = `Unknown${cores}`;
+            processorInfo.textContent = `${cores} Logical Cores`;
         }
         // Browser Info
         if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
@@ -568,6 +701,24 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             browser = browser ? browser[0] : "Unknown";
             browserInfo.textContent = browser;
         }
+
+        // Battery Info
+        if (batteryInfo) {
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(function(battery) {
+                    function updateBattery() {
+                        const level = Math.round(battery.level * 100);
+                        const charging = battery.charging ? " ⚡" : "";
+                        batteryInfo.textContent = `${level}%${charging}`;
+                    }
+                    updateBattery();
+                    battery.addEventListener('levelchange', updateBattery);
+                    battery.addEventListener('chargingchange', updateBattery);
+                });
+            } else {
+                batteryInfo.textContent = "Not Supported";
+            }
+        }
     }
 
     function populateProfileData(user, displayName, photoURL) {
@@ -588,53 +739,6 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
 
         // Populate header profile pic
         headerProfilePic.src = photoURL;
-    }
-
-    function initializeGoogleSearch() {
-        const searchForm = document.getElementById('googleSearchForm');
-        const searchInput = document.getElementById('googleSearchInput');
-        const suggestionsContainer = document.getElementById('googleSearchSuggestions');
-
-        searchInput.addEventListener('input', async () => {
-            const query = searchInput.value;
-            if (query.length < 2) {
-                suggestionsContainer.classList.add('hidden');
-                return;
-            }
-
-            try {
-                // Using a CORS proxy to bypass browser restrictions on the Google Suggest API
-                const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(`http://suggestqueries.google.com/complete/search?client=firefox&q=${query}`)}`);
-                const data = await response.json();
-                const suggestions = data[1];
-
-                suggestionsContainer.innerHTML = '';
-                if (suggestions.length > 0) {
-                    suggestions.forEach(suggestion => {
-                        const item = document.createElement('div');
-                        item.textContent = suggestion;
-                        item.className = 'p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600';
-                        item.addEventListener('click', () => {
-                            searchInput.value = suggestion;
-                            searchForm.submit();
-                        });
-                        suggestionsContainer.appendChild(item);
-                    });
-                    suggestionsContainer.classList.remove('hidden');
-                } else {
-                    suggestionsContainer.classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Error fetching search suggestions:', error);
-                suggestionsContainer.classList.add('hidden');
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!searchForm.contains(e.target)) {
-                suggestionsContainer.classList.add('hidden');
-            }
-        });
     }
 
     function initializeDashboardWidgets() {
@@ -892,6 +996,15 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         setTimeout(() => chatbotWindow.classList.add('hidden'), 300); // Wait for transition to finish
     });
 
+    // Handle suggestion chips
+    document.querySelectorAll('.chatbot-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            chatbotInput.value = chip.textContent;
+            // Trigger the submit event manually
+            chatbotForm.dispatchEvent(new Event('submit', { cancelable: true }));
+        });
+    });
+
     // Handle message submission
     chatbotForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -1005,7 +1118,7 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
             return "You can manage your to-do list in the 'My Tasks' section on the main dashboard. Just type in the input field to add a new task, and use the buttons to mark it as complete or delete it.";
         }
         if (lowerInput.includes('ai helper')) {
-            return "The AI Helper can generate content for you! Go to the 'AI Helper' section in the sidebar, type a prompt like 'write a blog post intro about AI', and click 'Generate'.";
+            return "The AI Helper acts as your creative assistant. It can write emails, draft blog posts, generate code, and brainstorm ideas. Just go to the 'AI Helper' tab, type what you need, and let the AI do the work!";
         }
         if (lowerInput.includes('sidebar') || lowerInput.includes('menu')) {
             return "You can collapse the sidebar by clicking the double-arrow button in the header. When it's collapsed, a similar button will appear to expand it again.";
@@ -1033,6 +1146,12 @@ MsgBox "Hello, " & userName & "!" & vbCrLf & "This is a message from your TNVS D
         }
         if (lowerInput.includes('game') || lowerInput.includes('how to play')) {
             return "The TNVS Game Zone features exciting games like Real Car Driving, Real Bike Driving, and Master Chess. You can access it by clicking 'TNVS Games' in the sidebar! Once there, just click 'Play Now' on any game card.";
+        }
+        if (lowerInput.includes('sudoku')) {
+            return "Our Sudoku Solver can solve any valid puzzle instantly! It also features a puzzle generator and a timer. You can find it in the sidebar under 'Sudoku Solver'.";
+        }
+        if (lowerInput.includes('qr') || lowerInput.includes('barcode')) {
+            return "The QR & Barcode tool allows you to generate custom QR codes for Wi-Fi, URLs, and more. It also includes an advanced scanner. Access it via the 'QR & Barcode' link in the sidebar.";
         }
         if (lowerInput.includes('contact')) {
             return "Contact us 9959933166";
